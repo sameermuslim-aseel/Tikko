@@ -6,6 +6,7 @@ import { DateStrip } from "./date-strip";
 import { TaskItem } from "./task-item";
 import { AddTaskDrawer } from "./add-task-drawer";
 import { TaskDetailDrawer } from "./task-detail-drawer";
+import { StreakChip } from "@/components/stats/streak-chip";
 import {
   fetchTasksForDate,
   setTaskCompletion,
@@ -65,17 +66,24 @@ export function TodayView({
       }
     },
 
-    // مرتب‌سازی (انجام‌شده‌ها پایین) سمت سرور است
-    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+    // مرتب‌سازی (انجام‌شده‌ها پایین) سمت سرور است.
+    // آمار هم باید تازه شود وگرنه استریک تا رفرش بعدی عوض نمی‌شود.
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+    },
   });
 
   return (
     <div className="flex flex-1 flex-col">
       <DateStrip selected={selected} onSelect={setSelected} />
 
-      <p className="px-4 pb-3 text-sm text-muted-foreground">
-        {formatFullDate(selected)}
-      </p>
+      <div className="flex items-center justify-between px-4 pb-3">
+        <p className="text-sm text-muted-foreground">
+          {formatFullDate(selected)}
+        </p>
+        <StreakChip />
+      </div>
 
       <div className="flex flex-1 flex-col gap-2 px-4 pb-24">
         {isPending && (

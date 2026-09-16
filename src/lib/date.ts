@@ -24,6 +24,13 @@ const fullDateFormatter = new Intl.DateTimeFormat(FA_LOCALE, {
   year: "numeric",
 });
 
+const numberFormatter = new Intl.NumberFormat(FA_LOCALE);
+
+/** عدد با ارقام فارسی — تا با تاریخ‌های شمسی هم‌خوان باشد */
+export function formatNumber(value: number): string {
+  return numberFormatter.format(value);
+}
+
 export function formatDayNumber(date: Date): string {
   return dayNumberFormatter.format(date);
 }

@@ -10,7 +10,7 @@ import {
   currentStreak,
   type DailyStat,
 } from "@/lib/streak";
-import { formatDayNumber, toDateKey } from "@/lib/date";
+import { formatDayNumber, formatNumber, toDateKey } from "@/lib/date";
 
 const HISTORY_DAYS = 90;
 const STRIP_DAYS = 14;
@@ -70,7 +70,7 @@ export function StatsView() {
         <span
           className={`text-4xl font-bold ${streak > 0 ? "text-emerald-600 dark:text-emerald-400" : ""}`}
         >
-          {streak}
+          {formatNumber(streak)}
         </span>
         <span className="text-sm text-muted-foreground">
           {streak > 0 ? "روز پشت‌سرهم" : "امروز شروع کن"}
@@ -84,12 +84,12 @@ export function StatsView() {
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1 rounded-xl border p-4">
           <span className="text-xs text-muted-foreground">بهترین استریک</span>
-          <span className="text-xl font-semibold">{best} روز</span>
+          <span className="text-xl font-semibold">{formatNumber(best)} روز</span>
         </div>
 
         <div className="flex flex-col gap-1 rounded-xl border p-4">
           <span className="text-xs text-muted-foreground">۳۰ روز اخیر</span>
-          <span className="text-xl font-semibold">٪{rate30}</span>
+          <span className="text-xl font-semibold">٪{formatNumber(rate30)}</span>
         </div>
       </div>
 
@@ -156,7 +156,7 @@ export function StatsView() {
       </div>
 
       <p className="pb-4 text-center text-xs text-muted-foreground">
-        مجموع تسک‌های انجام‌شده در {HISTORY_DAYS} روز: {totalDone}
+        مجموع تسک‌های انجام‌شده در {HISTORY_DAYS} روز: {formatNumber(totalDone)}
       </p>
     </div>
   );

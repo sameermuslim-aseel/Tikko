@@ -1,0 +1,14 @@
+# خطوط همیشه به‌صورت LF ذخیره و checkout می‌شوند.
+# Git for Windows با core.autocrlf=true فایل‌ها را در working copy به CRLF
+# تبدیل می‌کند و هر commit هشدار می‌دهد. این خط آن رفتار را خنثی می‌کند.
+* text=auto eol=lf
+
+# فایل‌های باینری نباید دست بخورند
+*.png  binary
+*.ico  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.woff  binary
+*.woff2 binary
+*.pdf  binary

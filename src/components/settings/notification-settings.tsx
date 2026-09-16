@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { BellRing, BellOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   hasActiveSubscription,
-  isStandalone,
+  iosNeedsHomeScreen,
   pushSupported,
   subscribeToPush,
   unsubscribeFromPush,
@@ -17,6 +17,9 @@ import {
   toTimeInput,
   type NotificationSettings,
 } from "@/lib/queries/settings";
+
+/** این مقادیر تغییر نمی‌کنند، پس نیازی به subscribe واقعی نیست */
+const subscribeNever = () => () => {};
 
 function Toggle({
   checked,
@@ -73,12 +76,23 @@ export function NotificationSettingsForm({
     hasActiveSubscription().then(setSubscribed);
   }, []);
 
-  const supported = pushSupported();
-  // iOS فقط در حالت نصب‌شده روی هوم‌اسکرین پوش می‌دهد
-  const iosNeedsInstall =
-    typeof navigator !== "undefined" &&
-    /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-    !isStandalone();
+  /*
+    این دو مقدار فقط در مرورگر معنا دارند. اگر مستقیم موقع render خوانده
+    شوند، سرور یک چیز و کلاینت چیز دیگری می‌سازد و hydration می‌شکند.
+    useSyncExternalStore دقیقاً برای همین است: سرور snapshot خودش را
+    می‌گیرد و کلاینت بعد از hydrate مقدار واقعی را.
+  */
+  const supported = useSyncExternalStore(
+    subscribeNever,
+    pushSupported,
+    () => false,
+  );
+
+  const iosNeedsInstall = useSyncExternalStore(
+    subscribeNever,
+    iosNeedsHomeScreen,
+    () => false,
+  );
 
   async function handleSubscribe() {
     setBusy(true);

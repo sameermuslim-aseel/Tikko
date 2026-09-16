@@ -22,6 +22,12 @@ export function pushSupported(): boolean {
   );
 }
 
+/** آیفونی که اپ را هنوز به هوم‌اسکرین اضافه نکرده — پوش کار نمی‌کند */
+export function iosNeedsHomeScreen(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !isStandalone();
+}
+
 /** روی iOS فقط وقتی اپ به هوم‌اسکرین اضافه شده باشد پوش کار می‌کند */
 export function isStandalone(): boolean {
   if (typeof window === "undefined") return false;

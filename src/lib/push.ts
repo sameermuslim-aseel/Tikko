@@ -39,6 +39,22 @@ export function isStandalone(): boolean {
   );
 }
 
+/**
+ * ثبت service worker فقط در production انجام می‌شود، پس روی localhost
+ * navigator.serviceWorker.ready هیچ‌وقت resolve نمی‌شود و دکمه برای همیشه
+ * روی «...» می‌ماند. این تابع به‌جای معطل ماندن، null برمی‌گرداند.
+ */
+async function getReadyRegistration(): Promise<ServiceWorkerRegistration | null> {
+  const existing = await navigator.serviceWorker.getRegistration();
+  if (!existing) return null;
+
+  // اگر ثبت شده ولی هنوز فعال نشده، بیش از چند ثانیه منتظر نمانیم
+  return Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+  ]);
+}
+
 function arrayBufferToBase64(buffer: ArrayBuffer | null): string {
   if (!buffer) return "";
   const bytes = new Uint8Array(buffer);
@@ -66,7 +82,10 @@ export async function subscribeToPush(userId: string): Promise<string | null> {
     return "اجازهٔ نوتیفیکیشن داده نشد.";
   }
 
-  const registration = await navigator.serviceWorker.ready;
+  const registration = await getReadyRegistration();
+  if (!registration) {
+    return "service worker ثبت نشده — در حالت توسعه (localhost) نوتیفیکیشن کار نمی‌کند. روی نسخهٔ آنلاین امتحان کنید.";
+  }
 
   // اگر اشتراک قبلی هست همان استفاده شود
   const existing = await registration.pushManager.getSubscription();
@@ -100,7 +119,9 @@ export async function subscribeToPush(userId: string): Promise<string | null> {
 export async function unsubscribeFromPush(): Promise<string | null> {
   if (!pushSupported()) return null;
 
-  const registration = await navigator.serviceWorker.ready;
+  const registration = await getReadyRegistration();
+  if (!registration) return null;
+
   const subscription = await registration.pushManager.getSubscription();
   if (!subscription) return null;
 
@@ -117,6 +138,8 @@ export async function unsubscribeFromPush(): Promise<string | null> {
 
 export async function hasActiveSubscription(): Promise<boolean> {
   if (!pushSupported()) return false;
-  const registration = await navigator.serviceWorker.ready;
+  const registration = await getReadyRegistration();
+  if (!registration) return false;
+
   return (await registration.pushManager.getSubscription()) !== null;
 }

@@ -23,11 +23,14 @@ export default async function AppLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, role, household_id")
+    .select("display_name, role, household_id, intro_seen_at")
     .eq("id", user.id)
     .single();
 
   if (!profile?.household_id) redirect("/onboarding");
+
+  // اولین ورود → آموزش کوتاه، یک بار
+  if (!profile.intro_seen_at) redirect("/welcome");
 
   // حرف اول نام برای آواتار — با [...] تا حروف چندبایتی هم درست بریده شوند
   const initial = [...(profile.display_name?.trim() ?? "")][0]?.toUpperCase() ?? "؟";

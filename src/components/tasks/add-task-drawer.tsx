@@ -242,7 +242,7 @@ export function AddTaskDrawer({
               </Button>
               <DrawerClose asChild>
                 <Button variant="ghost" type="button">
-                  انصراف
+                  لغو
                 </Button>
               </DrawerClose>
             </DrawerFooter>

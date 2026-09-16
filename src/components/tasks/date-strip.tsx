@@ -1,6 +1,12 @@
 "use client";
 
-import { formatDayNumber, formatWeekday, isSameDay, weekAround } from "@/lib/date";
+import {
+  formatDayNumber,
+  formatWeekday,
+  isSameDay,
+  toDateKey,
+  weekAround,
+} from "@/lib/date";
 
 export function DateStrip({
   selected,
@@ -10,6 +16,7 @@ export function DateStrip({
   onSelect: (date: Date) => void;
 }) {
   const today = new Date();
+  const todayKey = toDateKey(today);
   const days = weekAround(today);
 
   return (
@@ -17,6 +24,8 @@ export function DateStrip({
       {days.map((day) => {
         const isSelected = isSameDay(day, selected);
         const isToday = isSameDay(day, today);
+        // روز آینده قابل تیک زدن نیست — کم‌رنگ نشان داده می‌شود
+        const isFuture = toDateKey(day) > todayKey;
 
         return (
           <button
@@ -27,8 +36,13 @@ export function DateStrip({
             // هدف لمسی حداقل ۴۴px (PLAN بخش ۵)
             className={`flex h-16 min-w-12 shrink-0 flex-col items-center justify-center gap-1 rounded-xl border transition-colors ${
               isSelected
-                ? "border-foreground bg-foreground text-background"
-                : "border-transparent bg-muted text-foreground"
+                ? isFuture
+                  // انتخاب‌شده ولی هنوز نرسیده: حاشیه دارد اما پُر نیست
+                  ? "border-foreground/40 bg-transparent text-muted-foreground"
+                  : "border-foreground bg-foreground text-background"
+                : isFuture
+                  ? "border-transparent bg-muted/50 text-muted-foreground/50"
+                  : "border-transparent bg-muted text-foreground"
             }`}
           >
             <span className="text-[11px] opacity-70">{formatWeekday(day)}</span>

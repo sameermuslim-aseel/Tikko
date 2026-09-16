@@ -28,10 +28,20 @@ export function BottomNav({ role }: { role: Role }) {
             href={href}
             aria-current={active ? "page" : undefined}
             className={`flex flex-1 flex-col items-center gap-1 py-3 text-xs transition-colors ${
-              active ? "text-foreground" : "text-muted-foreground"
+              active ? "font-medium text-foreground" : "text-muted-foreground"
             }`}
           >
-            <Icon className="size-5" />
+            {/*
+              lucide آیکون «پُر» ندارد، همه outline هستند.
+              برای حالت انتخاب‌شده داخل آیکون را با همان رنگ و شفافیت کم
+              پر می‌کنیم تا توپر دیده شود ولی خطوطش هم پیدا بماند.
+            */}
+            <Icon
+              className="size-5"
+              fill={active ? "currentColor" : "none"}
+              fillOpacity={active ? 0.2 : 0}
+              strokeWidth={active ? 2.25 : 2}
+            />
             {label}
           </Link>
         );

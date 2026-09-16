@@ -22,11 +22,14 @@ export function toDateKey(date: Date): string {
 }
 
 /**
- * نمایش تاریخ شمسی. Intl با locale fa-IR به‌صورت پیش‌فرض
- * تقویم هجری شمسی و ارقام فارسی می‌دهد — بدون کتابخانهٔ اضافه.
- * برای نمایش میلادی، locale را به "fa-IR-u-ca-gregory" تغییر دهید.
+ * نمایش تاریخ شمسی به دری افغانستان.
+ *
+ * مهم: locale باید fa-AF باشد نه fa-IR — نام ماه‌ها فرق می‌کند:
+ *   fa-AF → ۲۵ سنبلهٔ ۱۴۰۵   (دری، افغانستان)
+ *   fa-IR → ۲۵ شهریور ۱۴۰۵   (فارسی، ایران)
+ * سال و ارقام یکی است، فقط نام ماه‌ها متفاوت‌اند.
  */
-const FA_LOCALE = "fa-IR";
+const FA_LOCALE = "fa-AF";
 
 const dayNumberFormatter = new Intl.DateTimeFormat(FA_LOCALE, { day: "numeric" });
 const weekdayFormatter = new Intl.DateTimeFormat(FA_LOCALE, { weekday: "narrow" });

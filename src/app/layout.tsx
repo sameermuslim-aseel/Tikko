@@ -41,7 +41,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="fa"
+      lang="fa-AF"
       dir="rtl"
       className={cn("h-full antialiased", vazirmatn.variable, "font-sans")}
     >

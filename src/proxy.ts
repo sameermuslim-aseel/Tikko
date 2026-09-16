@@ -63,7 +63,9 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // همه‌چیز به‌جز فایل‌های استاتیک و تصاویر
-    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    // همه‌چیز به‌جز فایل‌های استاتیک، تصاویر و فایل‌های PWA.
+    // sw.js باید بدون ورود هم قابل دسترس باشد وگرنه ثبت service worker
+    // به /login ریدایرکت می‌شود و شکست می‌خورد.
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

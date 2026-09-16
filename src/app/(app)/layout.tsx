@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, Settings } from "lucide-react";
+import { Bell, CircleQuestionMark, Settings } from "lucide-react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -71,6 +71,15 @@ export default async function AppLayout({
         </Link>
 
         <span className="flex shrink-0 items-center gap-1">
+          <Link
+            href="/welcome?replay=1"
+            aria-label="راهنما"
+            title="راهنما — تیکو چطور کار می‌کند"
+            className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted"
+          >
+            <CircleQuestionMark className="size-5" />
+          </Link>
+
           <Link
             href="/notifications"
             aria-label="نوتیفیکیشن‌ها"

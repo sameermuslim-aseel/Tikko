@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarCheck, Flame, LayoutDashboard } from "lucide-react";
+import { CalendarCheck, CalendarDays, Flame, LayoutDashboard } from "lucide-react";
 import type { Role } from "@/lib/types";
 
 export function BottomNav({ role }: { role: Role }) {
@@ -10,6 +10,7 @@ export function BottomNav({ role }: { role: Role }) {
 
   const items = [
     { href: "/", label: "امروز", Icon: CalendarCheck },
+    { href: "/week", label: "هفته", Icon: CalendarDays },
     { href: "/stats", label: "آمار", Icon: Flame },
     ...(role === "admin"
       ? [{ href: "/admin", label: "داشبورد", Icon: LayoutDashboard }]

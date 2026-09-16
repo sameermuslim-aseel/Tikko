@@ -21,6 +21,7 @@ type Profile = {
   notify_evening: boolean;
   notify_evening_at: string;
   notify_task_time: boolean;
+  notify_assigned: boolean;
 };
 
 type Subscription = {
@@ -73,7 +74,7 @@ Deno.serve(async (request) => {
   const { data: profiles } = await supabase
     .from("profiles")
     .select(
-      "id, display_name, notify_morning, notify_morning_at, notify_evening, notify_evening_at, notify_task_time",
+      "id, display_name, notify_morning, notify_morning_at, notify_evening, notify_evening_at, notify_task_time, notify_assigned",
     );
 
   const { data: subscriptions } = await supabase
@@ -100,7 +101,7 @@ Deno.serve(async (request) => {
 
   async function send(
     userId: string,
-    kind: "morning" | "evening" | "task",
+    kind: "morning" | "evening" | "task" | "assigned",
     refId: string | null,
     title: string,
     body: string,
@@ -142,6 +143,50 @@ Deno.serve(async (request) => {
       ref_id: refId,
       date: today,
     });
+  }
+
+  const profileById = new Map(
+    ((profiles ?? []) as Profile[]).map((p) => [p.id, p]),
+  );
+
+  // ---------------------------------------------------------------
+  // تسک‌های تازه‌ای که ادمین برای کس دیگری تعیین کرده
+  // گزارش این نوع بدون فیلتر تاریخ خوانده می‌شود: تسکی که دیشب
+  // ساخته شده نباید امروز دوباره اطلاع داده شود.
+  // ---------------------------------------------------------------
+  const { data: recentTasks } = await supabase
+    .from("tasks")
+    .select("id, title, assigned_to, created_by")
+    .eq("source", "admin")
+    .eq("is_active", true)
+    .gte("created_at", new Date(Date.now() - 24 * 3600 * 1000).toISOString());
+
+  const { data: assignedLog } = await supabase
+    .from("notification_log")
+    .select("ref_id")
+    .eq("kind", "assigned");
+
+  const assignedSent = new Set((assignedLog ?? []).map((row) => row.ref_id));
+
+  for (const task of recentTasks ?? []) {
+    // تسکی که ادمین برای خودش ساخته خبر ندارد
+    if (task.assigned_to === task.created_by) continue;
+    if (assignedSent.has(task.id)) continue;
+
+    const target = profileById.get(task.assigned_to);
+    if (!target?.notify_assigned) continue;
+
+    const assigner = profileById.get(task.created_by);
+
+    await send(
+      task.assigned_to,
+      "assigned",
+      task.id,
+      "تسک جدید 📌",
+      assigner?.display_name
+        ? `${assigner.display_name} برایت تعیین کرد: ${task.title}`
+        : task.title,
+    );
   }
 
   for (const profile of (profiles ?? []) as Profile[]) {

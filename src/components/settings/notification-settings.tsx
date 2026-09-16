@@ -229,6 +229,12 @@ export function NotificationSettingsForm({
         )}
 
         <Toggle
+          label="وقتی ادمین تسک جدید تعیین کرد"
+          checked={settings.notify_assigned}
+          onChange={(v) => setSettings({ ...settings, notify_assigned: v })}
+        />
+
+        <Toggle
           label="سر ساعت هر تسک"
           checked={settings.notify_task_time}
           onChange={(v) => setSettings({ ...settings, notify_task_time: v })}

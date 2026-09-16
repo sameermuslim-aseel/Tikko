@@ -12,7 +12,7 @@ export default async function SettingsPage() {
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "notify_morning, notify_morning_at, notify_evening, notify_evening_at, notify_task_time",
+      "notify_morning, notify_morning_at, notify_evening, notify_evening_at, notify_task_time, notify_assigned",
     )
     .eq("id", user!.id)
     .single();
@@ -23,6 +23,7 @@ export default async function SettingsPage() {
     notify_evening: profile?.notify_evening ?? true,
     notify_evening_at: profile?.notify_evening_at ?? "20:00",
     notify_task_time: profile?.notify_task_time ?? false,
+    notify_assigned: profile?.notify_assigned ?? true,
   };
 
   return (

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Settings } from "lucide-react";
+import { Bell, Settings } from "lucide-react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -35,6 +35,13 @@ export default async function AppLayout({
       <header className="flex items-center justify-between border-b px-4 py-3">
         <span className="text-sm font-medium">{profile.display_name}</span>
         <span className="flex items-center gap-3">
+          <Link
+            href="/notifications"
+            aria-label="نوتیفیکیشن‌ها"
+            className="text-muted-foreground"
+          >
+            <Bell className="size-5" />
+          </Link>
           <Link
             href="/settings"
             aria-label="تنظیمات"

@@ -137,11 +137,14 @@ Deno.serve(async (request) => {
       }
     }
 
+    // متن هم ذخیره می‌شود تا در صفحهٔ نوتیفیکیشن‌های اپ دیده شود
     await supabase.from("notification_log").insert({
       user_id: userId,
       kind,
       ref_id: refId,
       date: today,
+      title,
+      body,
     });
   }
 

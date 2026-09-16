@@ -39,6 +39,19 @@ const dayMonthFormatter = new Intl.DateTimeFormat(FA_LOCALE, {
   month: "long",
 });
 
+const dateTimeFormatter = new Intl.DateTimeFormat(FA_LOCALE, {
+  day: "numeric",
+  month: "long",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+/** «۲۵ سنبله، ۰۸:۰۰» — برای لیست نوتیفیکیشن‌ها */
+export function formatDateTime(value: string | Date): string {
+  const date = typeof value === "string" ? new Date(value) : value;
+  return dateTimeFormatter.format(date);
+}
+
 export function formatWeekdayLong(date: Date): string {
   return weekdayLongFormatter.format(date);
 }

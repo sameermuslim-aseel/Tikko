@@ -125,12 +125,14 @@ export function AddTaskDrawer({
           بلندتر شود (انتخاب «هفتگی» یا باز شدن کیبورد موبایل)، دکمهٔ ذخیره
           بریده می‌شود و راهی برای رسیدن به آن نیست.
         */}
-        <div className="mx-auto min-h-0 w-full max-w-md flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
-          <DrawerHeader>
+        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col">
+          <DrawerHeader className="shrink-0">
             <DrawerTitle>تسک شخصی جدید</DrawerTitle>
           </DrawerHeader>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5 px-4 pb-2">
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+            {/* فقط فیلدها اسکرول می‌شوند؛ دکمهٔ ذخیره همیشه دیده می‌شود */}
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 pb-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="title">عنوان</Label>
               <Input
@@ -228,7 +230,9 @@ export function AddTaskDrawer({
               </p>
             )}
 
-            <DrawerFooter className="px-0">
+            </div>
+
+            <DrawerFooter className="shrink-0 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
               <Button
                 type="submit"
                 disabled={create.isPending}

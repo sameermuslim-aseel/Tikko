@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Ellipsis } from "lucide-react";
+import { Check, Ellipsis, MessageSquareText } from "lucide-react";
 import type { TaskForDate } from "@/lib/types";
 
 export function TaskItem({
@@ -65,6 +65,12 @@ export function TaskItem({
               <span dir="ltr">{task.time_of_day.slice(0, 5)}</span>
             )}
             {task.source === "admin" && <span>تعیین‌شده</span>}
+            {task.note && (
+              <MessageSquareText
+                className="size-3"
+                aria-label="یادداشت دارد"
+              />
+            )}
           </span>
         </span>
       </button>

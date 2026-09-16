@@ -12,6 +12,7 @@ export type RangeTask = {
   category_name: string | null;
   category_color: string | null;
   is_completed: boolean;
+  note: string | null;
 };
 
 export async function fetchTasksForRange(

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, MessageSquareText } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchTasksForRange,
@@ -238,6 +238,13 @@ export function WeekView({ userId }: { userId: string }) {
                         >
                           {task.title}
                         </span>
+
+                        {task.note && (
+                          <MessageSquareText
+                            className="size-3 shrink-0 text-muted-foreground"
+                            aria-label="یادداشت دارد"
+                          />
+                        )}
 
                         {task.category_color && (
                           <span

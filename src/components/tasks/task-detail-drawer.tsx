@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Drawer,
@@ -10,7 +11,12 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { deleteTask, tasksQueryKey } from "@/lib/queries/tasks";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  deleteTask,
+  saveCompletionNote,
+  tasksQueryKey,
+} from "@/lib/queries/tasks";
 import type { Role, TaskForDate } from "@/lib/types";
 
 const PRIORITY_LABEL: Record<string, string> = {
@@ -18,6 +24,61 @@ const PRIORITY_LABEL: Record<string, string> = {
   medium: "متوسط",
   high: "زیاد",
 };
+
+/**
+ * ویرایشگر یادداشت. با key به ازای هر (تسک، روز) دوباره mount می‌شود،
+ * برای همین مقدار اولیه را از props می‌گیرد و به useEffect نیازی نیست.
+ */
+function NoteEditor({
+  taskId,
+  dateKey,
+  initialNote,
+}: {
+  taskId: string;
+  dateKey: string;
+  initialNote: string;
+}) {
+  const [note, setNote] = useState(initialNote);
+  const queryClient = useQueryClient();
+
+  const save = useMutation({
+    mutationFn: () => saveCompletionNote({ taskId, dateKey, note }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tasksQueryKey(dateKey) });
+      queryClient.invalidateQueries({ queryKey: ["week"] });
+    },
+  });
+
+  const unchanged = note.trim() === initialNote.trim();
+
+  return (
+    <>
+      <Textarea
+        id="note"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="مثلاً: نصفش را فردا تمام می‌کنم"
+        rows={3}
+      />
+
+      <Button
+        type="button"
+        variant="secondary"
+        disabled={save.isPending || unchanged}
+        onClick={() => save.mutate()}
+        className="h-11"
+      >
+        {save.isPending ? "..." : unchanged && save.isSuccess ? "ذخیره شد" : "ذخیرهٔ یادداشت"}
+      </Button>
+
+      {save.error && (
+        <p role="alert" className="text-sm text-destructive">
+          {save.error.message}
+        </p>
+      )}
+    </>
+  );
+}
 
 export function TaskDetailDrawer({
   task,
@@ -89,6 +150,26 @@ export function TaskDetailDrawer({
               <p className="text-muted-foreground">{task.description}</p>
             )}
           </dl>
+
+          {/* یادداشت فقط وقتی معنا دارد که تسک انجام شده باشد */}
+          <div className="mt-4 flex flex-col gap-2 px-4">
+            <label htmlFor="note" className="text-sm font-medium">
+              یادداشت
+            </label>
+
+            {task?.is_completed ? (
+              <NoteEditor
+                key={`${task.id}-${dateKey}`}
+                taskId={task.id}
+                dateKey={dateKey}
+                initialNote={task.note ?? ""}
+              />
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                بعد از تیک زدن تسک می‌توانی یادداشت بگذاری.
+              </p>
+            )}
+          </div>
 
           {remove.error && (
             <p role="alert" className="px-4 pt-3 text-sm text-destructive">

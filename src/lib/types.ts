@@ -16,4 +16,5 @@ export type TaskForDate = {
   category_name: string | null;
   category_color: string | null;
   is_completed: boolean;
+  note: string | null;
 };

@@ -75,6 +75,26 @@ export async function createSelfTask(params: {
   if (error) throw new Error(error.message);
 }
 
+/**
+ * یادداشت روی یک تسکِ انجام‌شده در یک روز مشخص.
+ * grant ستونی فقط اجازهٔ تغییر note را می‌دهد، نه task_id و date.
+ */
+export async function saveCompletionNote(params: {
+  taskId: string;
+  dateKey: string;
+  note: string;
+}): Promise<void> {
+  const trimmed = params.note.trim();
+
+  const { error } = await createClient()
+    .from("task_completions")
+    .update({ note: trimmed === "" ? null : trimmed })
+    .eq("task_id", params.taskId)
+    .eq("date", params.dateKey);
+
+  if (error) throw new Error(error.message);
+}
+
 /** حذف تسک — RLS فقط برای تسک‌های self خودِ کاربر (یا ادمین) اجازه می‌دهد */
 export async function deleteTask(taskId: string): Promise<void> {
   const { error } = await createClient().from("tasks").delete().eq("id", taskId);

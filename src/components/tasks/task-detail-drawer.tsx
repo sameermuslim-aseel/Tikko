@@ -47,7 +47,7 @@ export function TaskDetailDrawer({
   return (
     <Drawer open={task !== null} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent>
-        <div className="mx-auto w-full max-w-md">
+        <div className="mx-auto min-h-0 w-full max-w-md flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
           <DrawerHeader>
             <DrawerTitle>{task?.title}</DrawerTitle>
             <DrawerDescription>

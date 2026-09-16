@@ -114,7 +114,7 @@ export function AdminTaskDrawer({
         if (!next) reset();
       }}
     >
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-10">
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-10 pb-[env(safe-area-inset-bottom)]">
         <div className="relative mx-auto w-full max-w-md">
           <DrawerTrigger asChild>
             <button
@@ -129,7 +129,7 @@ export function AdminTaskDrawer({
       </div>
 
       <DrawerContent>
-        <div className="mx-auto w-full max-w-md overflow-y-auto">
+        <div className="mx-auto min-h-0 w-full max-w-md flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
           <DrawerHeader>
             <DrawerTitle>تعیین تسک</DrawerTitle>
           </DrawerHeader>

@@ -104,7 +104,7 @@ export function AddTaskDrawer({
         لایهٔ fixed تمام‌عرض، ولی ستون داخلی هم‌عرض اپ است تا دکمه روی
         دسکتاپ داخل قاب موبایل بماند نه گوشهٔ پنجره.
       */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-10">
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-10 pb-[env(safe-area-inset-bottom)]">
         <div className="relative mx-auto w-full max-w-md">
           <DrawerTrigger asChild>
             <button
@@ -120,7 +120,12 @@ export function AddTaskDrawer({
       </div>
 
       <DrawerContent>
-        <div className="mx-auto w-full max-w-md">
+        {/*
+          min-h-0 + overflow-y-auto لازم است وگرنه وقتی فرم از ارتفاع drawer
+          بلندتر شود (انتخاب «هفتگی» یا باز شدن کیبورد موبایل)، دکمهٔ ذخیره
+          بریده می‌شود و راهی برای رسیدن به آن نیست.
+        */}
+        <div className="mx-auto min-h-0 w-full max-w-md flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
           <DrawerHeader>
             <DrawerTitle>تسک شخصی جدید</DrawerTitle>
           </DrawerHeader>

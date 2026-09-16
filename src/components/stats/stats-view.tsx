@@ -66,6 +66,10 @@ export function StatsView() {
         <span className="text-sm text-muted-foreground">
           {streak > 0 ? "روز پشت‌سرهم" : "امروز شروع کن"}
         </span>
+        <span className="mt-1 text-center text-xs text-muted-foreground/80">
+          روزهایی که <span className="font-medium">همهٔ</span> تسک‌های آن روز را
+          انجام داده‌ای. روزِ بدون تسک استریک را نمی‌شکند.
+        </span>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -81,30 +85,58 @@ export function StatsView() {
       </div>
 
       {/* نوار ۱۴ روز اخیر */}
-      <div className="flex flex-col gap-2 rounded-xl border p-4">
-        <span className="text-xs text-muted-foreground">۱۴ روز اخیر</span>
+      <div className="flex flex-col gap-3 rounded-xl border p-4">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm font-medium">۱۴ روز اخیر</span>
+          <span className="text-xs text-muted-foreground">
+            هر مربع یک روز است. عدد زیر آن، تعداد تسک‌های انجام‌شده از کل آن روز.
+          </span>
+        </div>
 
         <div className="flex justify-between gap-1">
           {strip.map((stat) => {
             const state = dayState(stat);
+            const isToday = stat.day === todayKey;
+
             return (
               <div key={stat.day} className="flex flex-col items-center gap-1">
                 <div
-                  title={`${stat.completed}/${stat.total}`}
-                  className={`size-6 rounded-md ${
+                  aria-label={`${stat.day}: ${stat.completed} از ${stat.total}`}
+                  className={`size-7 rounded-md ${
+                    isToday ? "ring-2 ring-foreground ring-offset-1" : ""
+                  } ${
                     state === "done"
                       ? "bg-foreground"
                       : state === "partial"
-                        ? "bg-muted-foreground/40"
-                        : "bg-muted"
+                        ? "bg-foreground/40"
+                        : "border border-dashed border-muted-foreground/30 bg-transparent"
                   }`}
                 />
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-[10px] tabular-nums text-muted-foreground">
+                  {stat.total === 0 ? "—" : `${stat.completed}/${stat.total}`}
+                </span>
+                <span className="text-[10px] text-muted-foreground/70">
                   {formatDayNumber(new Date(`${stat.day}T00:00:00`))}
                 </span>
               </div>
             );
           })}
+        </div>
+
+        {/* راهنما — بدون این، مربع‌ها معنایی ندارند */}
+        <div className="flex flex-wrap gap-x-4 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <span className="size-3 rounded bg-foreground" />
+            همه انجام شد
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-3 rounded bg-foreground/40" />
+            ناقص
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-3 rounded border border-dashed border-muted-foreground/30" />
+            تسکی نبود
+          </span>
         </div>
       </div>
 

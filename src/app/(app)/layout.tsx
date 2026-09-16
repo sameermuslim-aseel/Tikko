@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Settings } from "lucide-react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -32,7 +34,16 @@ export default async function AppLayout({
     <div className="mx-auto flex min-h-full w-full max-w-md flex-1 flex-col border-x">
       <header className="flex items-center justify-between border-b px-4 py-3">
         <span className="text-sm font-medium">{profile.display_name}</span>
-        <SignOutButton />
+        <span className="flex items-center gap-3">
+          <Link
+            href="/settings"
+            aria-label="تنظیمات"
+            className="text-muted-foreground"
+          >
+            <Settings className="size-5" />
+          </Link>
+          <SignOutButton />
+        </span>
       </header>
       <QueryProvider>
         {children}

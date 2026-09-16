@@ -1,0 +1,275 @@
+"use client";
+
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { WeekdayPicker } from "@/components/tasks/weekday-picker";
+import { adminKeys, createAdminTask, fetchMembers } from "@/lib/queries/admin";
+import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
+import { toDateKey } from "@/lib/date";
+import type { Priority, ScheduleType } from "@/lib/types";
+
+const PRIORITIES: { value: Priority; label: string }[] = [
+  { value: "low", label: "کم" },
+  { value: "medium", label: "متوسط" },
+  { value: "high", label: "زیاد" },
+];
+
+export function AdminTaskDrawer({
+  householdId,
+  userId,
+}: {
+  householdId: string;
+  userId: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [assignedTo, setAssignedTo] = useState<string | null>(null);
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [priority, setPriority] = useState<Priority>("medium");
+  const [scheduleType, setScheduleType] = useState<ScheduleType>("weekly");
+  const [weekdays, setWeekdays] = useState<number[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const queryClient = useQueryClient();
+
+  const { data: members } = useQuery({
+    queryKey: adminKeys.members,
+    queryFn: fetchMembers,
+    enabled: open,
+  });
+
+  const { data: categories } = useQuery({
+    queryKey: categoriesQueryKey,
+    queryFn: fetchCategories,
+    enabled: open,
+  });
+
+  const create = useMutation({
+    mutationFn: () =>
+      createAdminTask({
+        householdId,
+        createdBy: userId,
+        assignedTo: assignedTo!,
+        title,
+        categoryId,
+        priority,
+        scheduleType,
+        weekdays,
+        dateKey: toDateKey(new Date()),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.tasks });
+      queryClient.invalidateQueries({ queryKey: ["admin", "progress"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      reset();
+      setOpen(false);
+    },
+    onError: (err) => setError(err.message),
+  });
+
+  function reset() {
+    setTitle("");
+    setAssignedTo(null);
+    setCategoryId(null);
+    setPriority("medium");
+    setScheduleType("weekly");
+    setWeekdays([]);
+    setError(null);
+  }
+
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    setError(null);
+
+    if (!assignedTo) {
+      setError("یک نفر را برای این تسک انتخاب کنید.");
+      return;
+    }
+    if (scheduleType === "weekly" && weekdays.length === 0) {
+      setError("حداقل یک روز هفته را انتخاب کنید.");
+      return;
+    }
+
+    create.mutate();
+  }
+
+  return (
+    <Drawer
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) reset();
+      }}
+    >
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-10">
+        <div className="relative mx-auto w-full max-w-md">
+          <DrawerTrigger asChild>
+            <button
+              type="button"
+              aria-label="تسک جدید"
+              className="pointer-events-auto absolute bottom-20 left-6 flex size-14 items-center justify-center rounded-full bg-foreground text-background shadow-lg"
+            >
+              <Plus className="size-6" />
+            </button>
+          </DrawerTrigger>
+        </div>
+      </div>
+
+      <DrawerContent>
+        <div className="mx-auto w-full max-w-md overflow-y-auto">
+          <DrawerHeader>
+            <DrawerTitle>تعیین تسک</DrawerTitle>
+          </DrawerHeader>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5 px-4 pb-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="admin-title">عنوان</Label>
+              <Input
+                id="admin-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="مثلاً: بردن زباله"
+                required
+                autoFocus
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label>برای چه کسی</Label>
+              <div className="flex flex-wrap gap-2">
+                {members?.map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setAssignedTo(m.id)}
+                    aria-pressed={assignedTo === m.id}
+                    className={`h-11 rounded-full border px-4 text-sm transition-colors ${
+                      assignedTo === m.id
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-input text-muted-foreground"
+                    }`}
+                  >
+                    {m.display_name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label>اولویت</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {PRIORITIES.map((p) => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => setPriority(p.value)}
+                    aria-pressed={priority === p.value}
+                    className={`h-11 rounded-lg border text-sm transition-colors ${
+                      priority === p.value
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-input text-muted-foreground"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {categories && categories.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <Label>کتگوری</Label>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() =>
+                        setCategoryId(categoryId === c.id ? null : c.id)
+                      }
+                      aria-pressed={categoryId === c.id}
+                      className={`flex h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors ${
+                        categoryId === c.id
+                          ? "border-foreground"
+                          : "border-input text-muted-foreground"
+                      }`}
+                    >
+                      <span
+                        className="size-2 rounded-full"
+                        style={{ backgroundColor: c.color ?? "#999" }}
+                      />
+                      {c.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2">
+              <Label>تکرار</Label>
+              <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
+                {(
+                  [
+                    ["weekly", "هفتگی"],
+                    ["once", "فقط امروز"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setScheduleType(value)}
+                    className={`h-10 rounded-md text-sm transition-colors ${
+                      scheduleType === value
+                        ? "bg-background font-medium shadow-sm"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {scheduleType === "weekly" && (
+              <WeekdayPicker value={weekdays} onChange={setWeekdays} />
+            )}
+
+            {error && (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
+
+            <DrawerFooter className="px-0">
+              <Button
+                type="submit"
+                disabled={create.isPending}
+                className="h-12 text-base"
+              >
+                {create.isPending ? "..." : "تعیین تسک"}
+              </Button>
+              <DrawerClose asChild>
+                <Button variant="ghost" type="button">
+                  انصراف
+                </Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </form>
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+}

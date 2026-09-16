@@ -18,7 +18,7 @@ export function TaskItem({
     // div بیرونی است چون دکمه داخل دکمه HTML نامعتبر است
     <div
       className={`flex items-center gap-1 rounded-xl border bg-background pl-1 transition-opacity ${
-        task.is_completed ? "opacity-50" : ""
+        task.is_completed ? "opacity-60" : ""
       }`}
     >
       <button
@@ -33,10 +33,11 @@ export function TaskItem({
           <span className="h-10 w-1 shrink-0 rounded-full bg-destructive" />
         )}
 
+        {/* سبز برای «انجام شد» — بازخورد مثبت، نه صرفاً تیره‌شدن */}
         <span
           className={`flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
             task.is_completed
-              ? "border-foreground bg-foreground text-background"
+              ? "border-emerald-500 bg-emerald-500 text-white"
               : "border-muted-foreground/40"
           }`}
         >

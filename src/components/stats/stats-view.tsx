@@ -1,5 +1,6 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { addDays } from "date-fns";
 import { fetchDailyStats, statsQueryKey } from "@/lib/queries/stats";
@@ -60,9 +61,17 @@ export function StatsView() {
   return (
     <div className="flex flex-col gap-4 px-4">
       {/* استریک فعلی */}
-      <div className="flex flex-col items-center gap-1 rounded-xl border p-6">
+      <div
+        className={`flex flex-col items-center gap-1 rounded-xl border p-6 ${
+          streak > 0 ? "border-emerald-500/40 bg-emerald-500/5" : ""
+        }`}
+      >
         <span className="text-4xl">{streak > 0 ? "🔥" : "🌱"}</span>
-        <span className="text-3xl font-bold">{streak}</span>
+        <span
+          className={`text-4xl font-bold ${streak > 0 ? "text-emerald-600 dark:text-emerald-400" : ""}`}
+        >
+          {streak}
+        </span>
         <span className="text-sm text-muted-foreground">
           {streak > 0 ? "روز پشت‌سرهم" : "امروز شروع کن"}
         </span>
@@ -89,32 +98,38 @@ export function StatsView() {
         <div className="flex flex-col gap-0.5">
           <span className="text-sm font-medium">۱۴ روز اخیر</span>
           <span className="text-xs text-muted-foreground">
-            هر مربع یک روز است. عدد زیر آن، تعداد تسک‌های انجام‌شده از کل آن روز.
+            هر مربع یک روز است. سبز یعنی همهٔ تسک‌های آن روز انجام شده.
           </span>
         </div>
 
-        <div className="flex justify-between gap-1">
+        {/* ۷ ستون در هر ردیف: روی موبایل هم جا می‌شود و از قاب بیرون نمی‌زند */}
+        <div className="grid grid-cols-7 gap-1.5">
           {strip.map((stat) => {
             const state = dayState(stat);
             const isToday = stat.day === todayKey;
 
             return (
-              <div key={stat.day} className="flex flex-col items-center gap-1">
+              <div key={stat.day} className="flex min-w-0 flex-col items-center gap-1">
                 <div
                   aria-label={`${stat.day}: ${stat.completed} از ${stat.total}`}
-                  className={`size-7 rounded-md ${
-                    isToday ? "ring-2 ring-foreground ring-offset-1" : ""
+                  className={`flex aspect-square w-full items-center justify-center rounded-lg text-[11px] font-medium tabular-nums ${
+                    isToday ? "outline-2 outline-foreground" : ""
                   } ${
                     state === "done"
-                      ? "bg-foreground"
+                      ? "bg-emerald-500 text-white"
                       : state === "partial"
-                        ? "bg-foreground/40"
-                        : "border border-dashed border-muted-foreground/30 bg-transparent"
+                        ? "bg-emerald-500/25 text-emerald-700 dark:text-emerald-300"
+                        : "border border-dashed border-muted-foreground/30 text-muted-foreground/50"
                   }`}
-                />
-                <span className="text-[10px] tabular-nums text-muted-foreground">
-                  {stat.total === 0 ? "—" : `${stat.completed}/${stat.total}`}
-                </span>
+                >
+                  {state === "done" ? (
+                    <Check className="size-4" strokeWidth={3} />
+                  ) : state === "partial" ? (
+                    `${stat.completed}/${stat.total}`
+                  ) : (
+                    "—"
+                  )}
+                </div>
                 <span className="text-[10px] text-muted-foreground/70">
                   {formatDayNumber(new Date(`${stat.day}T00:00:00`))}
                 </span>
@@ -126,11 +141,11 @@ export function StatsView() {
         {/* راهنما — بدون این، مربع‌ها معنایی ندارند */}
         <div className="flex flex-wrap gap-x-4 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded bg-foreground" />
+            <span className="size-3 rounded bg-emerald-500" />
             همه انجام شد
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded bg-foreground/40" />
+            <span className="size-3 rounded bg-emerald-500/25" />
             ناقص
           </span>
           <span className="flex items-center gap-1.5">

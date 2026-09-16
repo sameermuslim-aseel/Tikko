@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarCheck, LayoutDashboard } from "lucide-react";
+import { CalendarCheck, Flame, LayoutDashboard } from "lucide-react";
 import type { Role } from "@/lib/types";
 
 export function BottomNav({ role }: { role: Role }) {
@@ -10,13 +10,11 @@ export function BottomNav({ role }: { role: Role }) {
 
   const items = [
     { href: "/", label: "امروز", Icon: CalendarCheck },
+    { href: "/stats", label: "آمار", Icon: Flame },
     ...(role === "admin"
       ? [{ href: "/admin", label: "داشبورد", Icon: LayoutDashboard }]
       : []),
   ];
-
-  // برای عضو فقط یک آیتم می‌ماند؛ نوار ناوبری بی‌معنا می‌شود
-  if (items.length < 2) return null;
 
   return (
     <nav className="sticky bottom-0 z-20 flex border-t bg-background">

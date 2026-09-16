@@ -164,6 +164,8 @@ export function WeekView({ userId }: { userId: string }) {
           const dayTasks = byDay.get(key) ?? [];
           const done = dayTasks.filter((t) => t.is_completed).length;
           const isToday = isSameDay(day, today);
+          // روز آینده هنوز نرسیده؛ RLS هم اجازهٔ تیک نمی‌دهد
+          const isFuture = key > toDateKey(today);
 
           return (
             <section
@@ -211,10 +213,11 @@ export function WeekView({ userId }: { userId: string }) {
                       <button
                         type="button"
                         onClick={() => toggle.mutate(task)}
+                        disabled={isFuture}
                         aria-pressed={task.is_completed}
                         className={`flex w-full items-center gap-3 px-4 py-2.5 text-right transition-opacity ${
                           task.is_completed ? "opacity-60" : ""
-                        }`}
+                        } ${isFuture ? "opacity-50" : ""}`}
                       >
                         <span
                           className={`flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${

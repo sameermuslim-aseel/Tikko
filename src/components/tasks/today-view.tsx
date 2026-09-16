@@ -28,6 +28,9 @@ export function TodayView({
   const [detailTask, setDetailTask] = useState<TaskForDate | null>(null);
 
   const dateKey = toDateKey(selected);
+  // روز آینده هنوز نرسیده؛ تیک زدنش هم در UI و هم در RLS بسته است
+  const isFuture = dateKey > toDateKey(new Date());
+
   const queryClient = useQueryClient();
   const queryKey = tasksQueryKey(dateKey);
 
@@ -85,6 +88,12 @@ export function TodayView({
         <StreakChip />
       </div>
 
+      {isFuture && tasks && tasks.length > 0 && (
+        <p className="mx-4 mb-2 rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">
+          این روز هنوز نرسیده — وقتی برسد می‌توانی تیک بزنی.
+        </p>
+      )}
+
       <div className="flex flex-1 flex-col gap-2 px-4 pb-24">
         {isPending && (
           <>
@@ -115,7 +124,7 @@ export function TodayView({
             task={task}
             onToggle={toggle.mutate}
             onOpenDetail={setDetailTask}
-            disabled={toggle.isPending}
+            disabled={toggle.isPending || isFuture}
           />
         ))}
       </div>

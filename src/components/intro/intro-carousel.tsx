@@ -6,29 +6,41 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import {
   AssignIllustration,
+  HouseholdIllustration,
   StreakIllustration,
   TodayIllustration,
 } from "./illustrations";
 
 const SLIDES = [
   {
-    Illustration: TodayIllustration,
-    title: "هر روز، یک لیست ساده",
-    body: "تسک‌های همان روز را می‌بینی. با یک لمس تیک می‌زنی و همان‌جا سبز می‌شود. تیکِ امروز روی فردا اثر ندارد — فردا دوباره از نو شروع می‌شود.",
+    Illustration: HouseholdIllustration,
+    title: "اول یک خانواده",
+    body: "تیکو دور «خانواده» می‌چرخد. اگر اولین نفری، خانواده را خودت بساز و یک کد ۶ حرفی می‌گیری. اگر کسی قبلاً ساخته، همان کد را از او بگیر و با آن بپیوند.",
   },
   {
     Illustration: AssignIllustration,
-    title: "تسک‌ها را تعیین کن",
-    body: "ادمین خانواده می‌تواند برای هر کس تسک بگذارد و روزهای هفته‌اش را انتخاب کند. تسک‌های شخصی خودت را هم می‌توانی با دکمهٔ + اضافه یا حذف کنی.",
+    title: "ادمین و عضو",
+    body: "کسی که خانواده را می‌سازد ادمین می‌شود: برای همه تسک تعیین می‌کند، کتگوری می‌سازد و پیشرفت همه را می‌بیند. عضو تسک‌های خودش را می‌بیند و تیک می‌زند — تسکی که ادمین داده را نمی‌تواند حذف کند.",
+  },
+  {
+    Illustration: TodayIllustration,
+    title: "هر روز، یک لیست ساده",
+    body: "تسک‌های همان روز را می‌بینی و با یک لمس تیک می‌زنی. تیکِ امروز روی فردا اثر ندارد؛ تسک تکراری فردا دوباره بدون تیک می‌آید. تسک شخصی خودت را هم با دکمهٔ + اضافه کن.",
   },
   {
     Illustration: StreakIllustration,
     title: "پیوسته بمان",
-    body: "روزی که همهٔ تسک‌هایت را تمام کنی، استریکت یک روز بیشتر می‌شود. یادآوری‌ها هم کمک می‌کنند چیزی از قلم نیفتد.",
+    body: "روزی که همهٔ تسک‌های آن روز را تمام کنی، استریکت یک روز بیشتر می‌شود. روزِ بدون تسک آن را نمی‌شکند. یادآوری‌ها هم کمک می‌کنند چیزی از قلم نیفتد.",
   },
 ];
 
-export function IntroCarousel({ userId }: { userId: string }) {
+export function IntroCarousel({
+  userId,
+  hasHousehold,
+}: {
+  userId: string;
+  hasHousehold: boolean;
+}) {
   const [index, setIndex] = useState(0);
   const [pending, setPending] = useState(false);
   const router = useRouter();
@@ -46,7 +58,8 @@ export function IntroCarousel({ userId }: { userId: string }) {
       .update({ intro_seen_at: new Date().toISOString() })
       .eq("id", userId);
 
-    router.push("/");
+    // هنوز خانواده‌ای ندارد → مرحلهٔ بعد ساخت یا پیوستن است
+    router.push(hasHousehold ? "/" : "/onboarding");
     router.refresh();
   }
 

@@ -12,6 +12,15 @@ export default async function OnboardingPage() {
   // proxy.ts کاربر ناشناس را قبلاً رد کرده؛ این فقط محافظ دوم است.
   if (!user) redirect("/login");
 
+  // آموزش اول: بدون آن، کاربر تازه نمی‌داند «خانواده» و «کد دعوت» چیست
+  const { data: intro } = await supabase
+    .from("profiles")
+    .select("intro_seen_at")
+    .eq("id", user.id)
+    .single();
+
+  if (intro && !intro.intro_seen_at) redirect("/welcome");
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("display_name, household_id")

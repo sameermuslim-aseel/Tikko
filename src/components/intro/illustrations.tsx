@@ -6,6 +6,46 @@
 
 const EMERALD = "#10b981";
 
+/** ۰ — خانواده و کد دعوت */
+export function HouseholdIllustration() {
+  return (
+    <svg
+      viewBox="0 0 200 160"
+      className="h-40 w-full text-foreground"
+      fill="none"
+      aria-hidden
+    >
+      {/* خانه */}
+      <path
+        d="M100 26l46 34v62a6 6 0 01-6 6H60a6 6 0 01-6-6V60l46-34z"
+        stroke="currentColor" strokeWidth="3" strokeLinejoin="round"
+      />
+
+      {/* دو عضو داخل خانه */}
+      <g>
+        <circle cx="84" cy="86" r="9" stroke="currentColor" strokeWidth="2.5" />
+        <path d="M72 108c1.5-7 6-10.5 12-10.5s10.5 3.5 12 10.5" stroke="currentColor"
+          strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+      <g>
+        <circle cx="118" cy="86" r="9" fill={EMERALD} opacity="0.85" />
+        <path d="M106 108c1.5-7 6-10.5 12-10.5s10.5 3.5 12 10.5" stroke={EMERALD}
+          strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+
+      {/* کد دعوت */}
+      <rect x="62" y="122" width="76" height="20" rx="10"
+        fill="currentColor" opacity="0.08" />
+      <g opacity="0.55">
+        <rect x="74" y="130" width="10" height="4" rx="2" fill="currentColor" />
+        <rect x="88" y="130" width="10" height="4" rx="2" fill="currentColor" />
+        <rect x="102" y="130" width="10" height="4" rx="2" fill="currentColor" />
+        <rect x="116" y="130" width="10" height="4" rx="2" fill="currentColor" />
+      </g>
+    </svg>
+  );
+}
+
 /** ۱ — چک‌لیست امروز داخل قاب موبایل */
 export function TodayIllustration() {
   return (

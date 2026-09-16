@@ -3,8 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { IntroCarousel } from "@/components/intro/intro-carousel";
 
 /**
- * آموزش اولیه — بیرون از گروه (app) است تا هدر و نوار پایین را نداشته باشد.
- * proxy.ts کاربر ناشناس را قبلاً رد کرده.
+ * آموزش اولیه — قبل از onboarding نشان داده می‌شود، چون کاربر تازه
+ * هنوز نمی‌داند «خانواده» یعنی چه و ادمین با عضو چه فرقی دارد.
+ *
+ * بیرون از گروه (app) است تا هدر و نوار پایین را نداشته باشد.
  */
 export default async function WelcomePage({
   searchParams,
@@ -26,17 +28,22 @@ export default async function WelcomePage({
     .eq("id", user.id)
     .single();
 
-  // هنوز عضو خانواده‌ای نیست → اول onboarding
-  if (!profile?.household_id) redirect("/onboarding");
-
   const { data: intro } = await supabase
     .from("profiles")
     .select("intro_seen_at")
     .eq("id", user.id)
     .single();
 
-  // وقتی خودش دکمهٔ راهنما را زده، حتی اگر قبلاً دیده باشد نشان بده
-  if (!replay && (!intro || intro.intro_seen_at)) redirect("/");
+  // وقتی خودش دکمهٔ راهنما را زده، حتی اگر قبلاً دیده باشد نشان بده.
+  // ستون نبودن (migration اجرا نشده) هم نباید راه را ببندد.
+  if (!replay && (!intro || intro.intro_seen_at)) {
+    redirect(profile?.household_id ? "/" : "/onboarding");
+  }
 
-  return <IntroCarousel userId={user.id} />;
+  return (
+    <IntroCarousel
+      userId={user.id}
+      hasHousehold={Boolean(profile?.household_id)}
+    />
+  );
 }

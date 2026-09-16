@@ -21,6 +21,17 @@ export default async function AppLayout({
 
   if (!user) redirect("/login");
 
+  // آموزش قبل از همه‌چیز: کاربر تازه باید اول بداند خانواده یعنی چه
+  const { data: intro } = await supabase
+    .from("profiles")
+    .select("intro_seen_at")
+    .eq("id", user.id)
+    .single();
+
+  // کوئری جدا از پایین است: اگر migration این ستون اجرا نشده باشد،
+  // نباید کل کوئری پروفایل خطا بدهد و حلقهٔ ریدایرکت بسازد.
+  if (intro && !intro.intro_seen_at) redirect("/welcome");
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("display_name, role, household_id")
@@ -28,18 +39,6 @@ export default async function AppLayout({
     .single();
 
   if (!profile?.household_id) redirect("/onboarding");
-
-  // جدا از کوئری بالا: اگر migration این ستون هنوز اجرا نشده باشد،
-  // کوئری خطا می‌دهد و profile کلاً null می‌شود — آن وقت شرط بالا
-  // کاربر را به onboarding می‌فرستد و حلقهٔ ریدایرکت درست می‌شود.
-  const { data: intro } = await supabase
-    .from("profiles")
-    .select("intro_seen_at")
-    .eq("id", user.id)
-    .single();
-
-  // اولین ورود → آموزش کوتاه، یک بار
-  if (intro && !intro.intro_seen_at) redirect("/welcome");
 
   // حرف اول نام برای آواتار — با [...] تا حروف چندبایتی هم درست بریده شوند
   const initial = [...(profile.display_name?.trim() ?? "")][0]?.toUpperCase() ?? "؟";

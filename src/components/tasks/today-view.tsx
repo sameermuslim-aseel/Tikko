@@ -7,6 +7,7 @@ import { TaskItem } from "./task-item";
 import { AddTaskDrawer } from "./add-task-drawer";
 import { TaskDetailDrawer } from "./task-detail-drawer";
 import { StreakChip } from "@/components/stats/streak-chip";
+import { OverdueSection } from "./overdue-section";
 import {
   fetchTasksForDate,
   setTaskCompletion,
@@ -74,6 +75,7 @@ export function TodayView({
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: ["stats"] });
+      queryClient.invalidateQueries({ queryKey: ["overdue"] });
     },
   });
 
@@ -93,6 +95,8 @@ export function TodayView({
           این روز هنوز نرسیده — وقتی برسد می‌توانی تیک بزنی.
         </p>
       )}
+
+      {dateKey === toDateKey(new Date()) && <OverdueSection userId={userId} />}
 
       <div className="flex flex-1 flex-col gap-2 px-4 pb-24">
         {isPending && (

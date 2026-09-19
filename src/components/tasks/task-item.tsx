@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Ellipsis, MessageSquareText } from "lucide-react";
+import { Check, Ellipsis, MessageSquareText, Minus } from "lucide-react";
 import type { TaskForDate } from "@/lib/types";
 
 export function TaskItem({
@@ -14,11 +14,13 @@ export function TaskItem({
   onOpenDetail: (task: TaskForDate) => void;
   disabled?: boolean;
 }) {
+  const isSkipped = task.status === "skipped";
+
   return (
     // div بیرونی است چون دکمه داخل دکمه HTML نامعتبر است
     <div
       className={`flex items-center gap-1 rounded-xl border bg-background pl-1 transition-opacity ${
-        task.is_completed ? "opacity-60" : ""
+        task.is_completed || isSkipped ? "opacity-60" : ""
       }`}
     >
       <button
@@ -38,15 +40,18 @@ export function TaskItem({
           className={`flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
             task.is_completed
               ? "border-emerald-500 bg-emerald-500 text-white"
-              : "border-muted-foreground/40"
+              : isSkipped
+                ? "border-muted-foreground/40 text-muted-foreground"
+                : "border-muted-foreground/40"
           }`}
         >
           {task.is_completed && <Check className="size-4" strokeWidth={3} />}
+          {isSkipped && <Minus className="size-3.5" strokeWidth={3} />}
         </span>
 
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span
-            className={`truncate text-base ${task.is_completed ? "line-through" : ""}`}
+            className={`truncate text-base ${task.is_completed || isSkipped ? "line-through" : ""}`}
           >
             {task.title}
           </span>
@@ -64,6 +69,7 @@ export function TaskItem({
             {task.time_of_day && (
               <span dir="ltr">{task.time_of_day.slice(0, 5)}</span>
             )}
+            {isSkipped && <span>رد شد</span>}
             {task.source === "admin" && <span>تعیین‌شده</span>}
             {task.note && (
               <MessageSquareText

@@ -2,6 +2,7 @@ export type Priority = "low" | "medium" | "high";
 export type TaskSource = "admin" | "self";
 export type ScheduleType = "once" | "weekly";
 export type Role = "admin" | "member";
+export type CompletionStatus = "done" | "skipped";
 
 /** خروجی تابع get_tasks_for_date */
 export type TaskForDate = {
@@ -17,4 +18,5 @@ export type TaskForDate = {
   category_color: string | null;
   is_completed: boolean;
   note: string | null;
+  status: CompletionStatus | null;
 };

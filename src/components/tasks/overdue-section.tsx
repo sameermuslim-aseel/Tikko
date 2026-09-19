@@ -11,9 +11,15 @@ import {
   skipOverdue,
   type OverdueTask,
 } from "@/lib/queries/overdue";
-import { formatDayMonth, formatNumber } from "@/lib/date";
+import { formatDayMonth, formatNumber, relativeDayLabel } from "@/lib/date";
 
 type Action = "done" | "today" | "skip";
+
+const PRIORITY_LABEL: Record<string, string> = {
+  high: "زیاد",
+  medium: "متوسط",
+  low: "کم",
+};
 
 export function OverdueSection({ userId }: { userId: string }) {
   const [open, setOpen] = useState(true);
@@ -70,6 +76,14 @@ export function OverdueSection({ userId }: { userId: string }) {
   // چیزی عقب نمانده → اصلاً چیزی نشان نده
   if (!tasks || tasks.length === 0) return null;
 
+  // گروه‌بندی بر اساس روز، تا معلوم باشد هر کدام مال کدام روز است
+  const byDay = new Map<string, OverdueTask[]>();
+  for (const task of tasks) {
+    const list = byDay.get(task.day) ?? [];
+    list.push(task);
+    byDay.set(task.day, list);
+  }
+
   return (
     <section className="mx-4 mb-3 overflow-hidden rounded-xl border border-amber-500/40 bg-amber-500/5">
       <button
@@ -78,9 +92,17 @@ export function OverdueSection({ userId }: { userId: string }) {
         aria-expanded={open}
         className="flex w-full items-center justify-between px-4 py-3 text-right"
       >
-        <span className="text-sm font-medium">
-          از روزهای قبل مانده ({formatNumber(tasks.length)})
+        <span className="flex flex-col">
+          <span className="text-sm font-medium">
+            از روزهای قبل مانده ({formatNumber(tasks.length)})
+          </span>
+          {!open && (
+            <span className="text-xs text-muted-foreground">
+              برای بررسی لمس کن
+            </span>
+          )}
         </span>
+
         {open ? (
           <ChevronDown className="size-4 text-muted-foreground" />
         ) : (
@@ -89,57 +111,94 @@ export function OverdueSection({ userId }: { userId: string }) {
       </button>
 
       {open && (
-        <ul className="flex flex-col border-t border-amber-500/20">
-          {tasks.map((task) => (
-            <li
-              key={`${task.id}-${task.day}`}
-              className="flex flex-col gap-2 px-4 py-3"
-            >
-              <div className="flex items-center gap-2">
-                {task.priority === "high" && (
-                  <span className="h-4 w-1 shrink-0 rounded-full bg-destructive" />
-                )}
+        <div className="border-t border-amber-500/20">
+          <p className="px-4 pt-3 text-xs text-muted-foreground">
+            هر کدام را بررسی کن: انجامش دادی، امروز می‌کنی، یا دیگر لازم نیست.
+          </p>
 
-                <span className="min-w-0 flex-1 truncate text-sm">
-                  {task.title}
+          {[...byDay.entries()].map(([day, dayTasks]) => (
+            <div key={day}>
+              <div className="flex items-baseline gap-2 px-4 pt-3">
+                <span className="text-xs font-medium">
+                  {relativeDayLabel(day)}
                 </span>
-
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  {formatDayMonth(new Date(`${task.day}T00:00:00`))}
+                <span className="text-[11px] text-muted-foreground">
+                  {formatDayMonth(new Date(`${day}T00:00:00`))}
                 </span>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  disabled={act.isPending}
-                  onClick={() => act.mutate({ task, action: "done" })}
-                  className="h-9 rounded-lg bg-emerald-500 text-xs font-medium text-white"
-                >
-                  انجام شد
-                </button>
+              <ul className="flex flex-col">
+                {dayTasks.map((task) => (
+                  <li
+                    key={`${task.id}-${task.day}`}
+                    className="flex flex-col gap-2 px-4 py-2.5"
+                  >
+                    <div className="flex items-center gap-2">
+                      {task.priority === "high" && (
+                        <span className="h-4 w-1 shrink-0 rounded-full bg-destructive" />
+                      )}
 
-                <button
-                  type="button"
-                  disabled={act.isPending}
-                  onClick={() => act.mutate({ task, action: "today" })}
-                  className="h-9 rounded-lg border border-input text-xs"
-                >
-                  امروز می‌کنم
-                </button>
+                      <span className="min-w-0 flex-1 truncate text-sm">
+                        {task.title}
+                      </span>
+                    </div>
 
-                <button
-                  type="button"
-                  disabled={act.isPending}
-                  onClick={() => act.mutate({ task, action: "skip" })}
-                  className="h-9 rounded-lg border border-input text-xs text-muted-foreground"
-                >
-                  رد شد
-                </button>
-              </div>
-            </li>
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+                      {task.category_name && (
+                        <span className="flex items-center gap-1">
+                          <span
+                            className="size-2 rounded-full"
+                            style={{
+                              backgroundColor: task.category_color ?? "#999",
+                            }}
+                          />
+                          {task.category_name}
+                        </span>
+                      )}
+
+                      <span>اولویت {PRIORITY_LABEL[task.priority]}</span>
+
+                      {task.source === "admin" && <span>تعیین‌شده</span>}
+
+                      {task.schedule_type === "weekly" && <span>تکراری</span>}
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        disabled={act.isPending}
+                        onClick={() => act.mutate({ task, action: "done" })}
+                        className="h-9 rounded-lg bg-emerald-500 text-xs font-medium text-white"
+                      >
+                        انجام شد
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={act.isPending}
+                        onClick={() => act.mutate({ task, action: "today" })}
+                        className="h-9 rounded-lg border border-input bg-background text-xs"
+                      >
+                        امروز می‌کنم
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={act.isPending}
+                        onClick={() => act.mutate({ task, action: "skip" })}
+                        className="h-9 rounded-lg border border-input bg-background text-xs text-muted-foreground"
+                      >
+                        لازم نیست
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+
+          <div className="h-2" />
+        </div>
       )}
 
       {act.error && (

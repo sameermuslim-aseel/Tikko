@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Ellipsis, MessageSquareText, Minus } from "lucide-react";
+import { relativeDayLabel } from "@/lib/date";
 import type { TaskForDate } from "@/lib/types";
 
 export function TaskItem({
@@ -71,6 +72,13 @@ export function TaskItem({
             )}
             {isSkipped && <span>رد شد</span>}
             {task.source === "admin" && <span>تعیین‌شده</span>}
+
+            {/* از کدام روز عقب افتاده بود — وگرنه در لیست امروز گم می‌شود */}
+            {task.deferred_from && !task.is_completed && (
+              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] text-amber-700 dark:text-amber-400">
+                مانده از {relativeDayLabel(task.deferred_from)}
+              </span>
+            )}
             {task.note && (
               <MessageSquareText
                 className="size-3"

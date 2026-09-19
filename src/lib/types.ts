@@ -19,4 +19,6 @@ export type TaskForDate = {
   is_completed: boolean;
   note: string | null;
   status: CompletionStatus | null;
+  /** اگر از روز دیگری به امروز منتقل شده، تاریخ اصلی */
+  deferred_from: string | null;
 };

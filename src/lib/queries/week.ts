@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Priority, TaskSource } from "@/lib/types";
+import type { CompletionStatus, Priority, TaskSource } from "@/lib/types";
 
 /** یک «نمونه» از تسک در یک روز مشخص */
 export type RangeTask = {
@@ -13,6 +13,7 @@ export type RangeTask = {
   category_color: string | null;
   is_completed: boolean;
   note: string | null;
+  status: CompletionStatus | null;
 };
 
 export async function fetchTasksForRange(

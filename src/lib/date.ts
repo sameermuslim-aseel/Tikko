@@ -1,4 +1,12 @@
-import { addDays, addWeeks, format, isSameDay, startOfDay, startOfWeek } from "date-fns";
+import {
+  addDays,
+  addWeeks,
+  differenceInCalendarDays,
+  format,
+  isSameDay,
+  startOfDay,
+  startOfWeek,
+} from "date-fns";
 
 /** هفتهٔ ایرانی از شنبه شروع می‌شود (date-fns: 6 = شنبه) */
 const WEEK_STARTS_ON = 6 as const;
@@ -50,6 +58,19 @@ const dateTimeFormatter = new Intl.DateTimeFormat(FA_LOCALE, {
 export function formatDateTime(value: string | Date): string {
   const date = typeof value === "string" ? new Date(value) : value;
   return dateTimeFormatter.format(date);
+}
+
+/**
+ * «دیروز» یا «۳ روز پیش» — برای لیست عقب‌افتاده‌ها خواناتر از تاریخ خام است
+ */
+export function relativeDayLabel(day: string, today = new Date()): string {
+  const target = new Date(`${day}T00:00:00`);
+  const diff = differenceInCalendarDays(startOfDay(today), target);
+
+  if (diff <= 0) return "امروز";
+  if (diff === 1) return "دیروز";
+  if (diff === 2) return "پریروز";
+  return `${numberFormatter.format(diff)} روز پیش`;
 }
 
 export function formatWeekdayLong(date: Date): string {

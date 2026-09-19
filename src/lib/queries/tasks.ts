@@ -23,21 +23,24 @@ export async function setTaskCompletion(params: {
 }): Promise<void> {
   const supabase = createClient();
 
-  if (params.completed) {
-    const { error } = await supabase.from("task_completions").insert({
-      task_id: params.taskId,
-      date: params.dateKey,
-      completed_by: params.userId,
-    });
-    if (error) throw new Error(error.message);
-    return;
-  }
-
-  const { error } = await supabase
+  // همیشه اول ردیف قبلی پاک می‌شود. ممکن است status='skipped' باشد و
+  // insert مستقیم به unique (task_id, date) بخورد.
+  const { error: deleteError } = await supabase
     .from("task_completions")
     .delete()
     .eq("task_id", params.taskId)
     .eq("date", params.dateKey);
+
+  if (deleteError) throw new Error(deleteError.message);
+
+  if (!params.completed) return;
+
+  const { error } = await supabase.from("task_completions").insert({
+    task_id: params.taskId,
+    date: params.dateKey,
+    completed_by: params.userId,
+    status: "done",
+  });
 
   if (error) throw new Error(error.message);
 }

@@ -19,7 +19,7 @@ import { WeekdayPicker } from "@/components/tasks/weekday-picker";
 import { adminKeys, createAdminTask, fetchMembers } from "@/lib/queries/admin";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
 import { toDateKey } from "@/lib/date";
-import type { Priority, ScheduleType } from "@/lib/types";
+import type { AssignmentType, Priority, ScheduleType } from "@/lib/types";
 
 const PRIORITIES: { value: Priority; label: string }[] = [
   { value: "low", label: "کم" },
@@ -41,6 +41,7 @@ export function AdminTaskDrawer({
   const [priority, setPriority] = useState<Priority>("medium");
   const [scheduleType, setScheduleType] = useState<ScheduleType>("weekly");
   const [weekdays, setWeekdays] = useState<number[]>([]);
+  const [assignmentType, setAssignmentType] = useState<AssignmentType>("one");
   const [error, setError] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
@@ -62,13 +63,14 @@ export function AdminTaskDrawer({
       createAdminTask({
         householdId,
         createdBy: userId,
-        assignedTo: assignedTo!,
+        assignedTo,
         title,
         categoryId,
         priority,
         scheduleType,
         weekdays,
         dateKey: toDateKey(new Date()),
+        assignmentType,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.tasks });
@@ -87,6 +89,7 @@ export function AdminTaskDrawer({
     setPriority("medium");
     setScheduleType("weekly");
     setWeekdays([]);
+    setAssignmentType("one");
     setError(null);
   }
 
@@ -94,8 +97,8 @@ export function AdminTaskDrawer({
     event.preventDefault();
     setError(null);
 
-    if (!assignedTo) {
-      setError("یک نفر را برای این تسک انتخاب کنید.");
+    if (assignmentType === "one" && !assignedTo) {
+      setError("یک نفر را انتخاب کنید یا تسک را مشترک بگذارید.");
       return;
     }
     if (scheduleType === "weekly" && weekdays.length === 0) {
@@ -156,10 +159,13 @@ export function AdminTaskDrawer({
                   <button
                     key={m.id}
                     type="button"
-                    onClick={() => setAssignedTo(m.id)}
-                    aria-pressed={assignedTo === m.id}
+                    onClick={() => {
+                      setAssignedTo(m.id);
+                      setAssignmentType("one");
+                    }}
+                    aria-pressed={assignmentType === "one" && assignedTo === m.id}
                     className={`h-11 rounded-full border px-4 text-sm transition-colors ${
-                      assignedTo === m.id
+                      assignmentType === "one" && assignedTo === m.id
                         ? "border-foreground bg-foreground text-background"
                         : "border-input text-muted-foreground"
                     }`}
@@ -167,7 +173,31 @@ export function AdminTaskDrawer({
                     {m.display_name}
                   </button>
                 ))}
+
+                {/* کار خانه همیشه مال یک نفر مشخص نیست */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAssignmentType("shared");
+                    setAssignedTo(null);
+                  }}
+                  aria-pressed={assignmentType === "shared"}
+                  className={`h-11 rounded-full border px-4 text-sm transition-colors ${
+                    assignmentType === "shared"
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-input text-muted-foreground"
+                  }`}
+                >
+                  مشترک
+                </button>
               </div>
+
+              {assignmentType === "shared" && (
+                <p className="text-xs text-muted-foreground">
+                  در لیست همه دیده می‌شود؛ هر کی زودتر انجام داد، برای همه
+                  انجام‌شده حساب می‌شود.
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col gap-2">

@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Priority, Role, ScheduleType } from "@/lib/types";
+import type {
+  AssignmentType,
+  Priority,
+  Role,
+  ScheduleType,
+} from "@/lib/types";
 
 export type Member = {
   id: string;
@@ -10,7 +15,8 @@ export type Member = {
 export type AdminTask = {
   id: string;
   title: string;
-  assigned_to: string;
+  assigned_to: string | null;
+  assignment_type: AssignmentType;
   category_id: string | null;
   priority: Priority;
   source: "admin" | "self";
@@ -46,7 +52,7 @@ export async function fetchAdminTasks(): Promise<AdminTask[]> {
   const { data, error } = await createClient()
     .from("tasks")
     .select(
-      "id, title, assigned_to, category_id, priority, source, schedule_type, weekdays, due_date, is_active",
+      "id, title, assigned_to, assignment_type, category_id, priority, source, schedule_type, weekdays, due_date, is_active",
     )
     .eq("is_active", true)
     .order("created_at", { ascending: false });
@@ -72,20 +78,23 @@ export async function fetchMemberProgress(
 export async function createAdminTask(params: {
   householdId: string;
   createdBy: string;
-  assignedTo: string;
+  assignedTo: string | null;
   title: string;
   categoryId: string | null;
   priority: Priority;
   scheduleType: ScheduleType;
   weekdays: number[];
   dateKey: string;
+  assignmentType: AssignmentType;
 }): Promise<void> {
   const isWeekly = params.scheduleType === "weekly";
+  const isShared = params.assignmentType === "shared";
 
   const { error } = await createClient().from("tasks").insert({
     household_id: params.householdId,
     created_by: params.createdBy,
-    assigned_to: params.assignedTo,
+    assigned_to: isShared ? null : params.assignedTo,
+    assignment_type: params.assignmentType,
     title: params.title.trim(),
     category_id: params.categoryId,
     priority: params.priority,

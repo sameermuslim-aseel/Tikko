@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { WeekdayPicker } from "./weekday-picker";
 import { createSelfTask, tasksQueryKey } from "@/lib/queries/tasks";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
-import type { Priority, ScheduleType } from "@/lib/types";
+import type { AssignmentType, Priority, ScheduleType } from "@/lib/types";
 
 const PRIORITIES: { value: Priority; label: string }[] = [
   { value: "low", label: "کم" },
@@ -41,6 +41,7 @@ export function AddTaskDrawer({
   const [priority, setPriority] = useState<Priority>("medium");
   const [scheduleType, setScheduleType] = useState<ScheduleType>("once");
   const [weekdays, setWeekdays] = useState<number[]>([]);
+  const [assignmentType, setAssignmentType] = useState<AssignmentType>("one");
   const [error, setError] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
@@ -62,6 +63,7 @@ export function AddTaskDrawer({
         scheduleType,
         weekdays,
         dateKey,
+        assignmentType,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tasksQueryKey(dateKey) });
@@ -77,6 +79,7 @@ export function AddTaskDrawer({
     setPriority("medium");
     setScheduleType("once");
     setWeekdays([]);
+    setAssignmentType("one");
     setError(null);
   }
 
@@ -194,6 +197,37 @@ export function AddTaskDrawer({
                 </div>
               </div>
             )}
+
+            <div className="flex flex-col gap-2">
+              <Label>برای کی</Label>
+              <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
+                {(
+                  [
+                    ["one", "خودم"],
+                    ["shared", "مشترک"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setAssignmentType(value)}
+                    className={`h-10 rounded-md text-sm transition-colors ${
+                      assignmentType === value
+                        ? "bg-background font-medium shadow-sm"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {assignmentType === "shared" && (
+                <p className="text-xs text-muted-foreground">
+                  در لیست همه دیده می‌شود؛ هر کی زودتر انجام داد، برای همه
+                  انجام‌شده حساب می‌شود.
+                </p>
+              )}
+            </div>
 
             <div className="flex flex-col gap-2">
               <Label>تکرار</Label>

@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Priority, ScheduleType, TaskForDate } from "@/lib/types";
+import type {
+  AssignmentType,
+  Priority,
+  ScheduleType,
+  TaskForDate,
+} from "@/lib/types";
 
 /** تسک‌های یک روز برای کاربر جاری */
 export async function fetchTasksForDate(dateKey: string): Promise<TaskForDate[]> {
@@ -58,13 +63,17 @@ export async function createSelfTask(params: {
   scheduleType: ScheduleType;
   weekdays: number[];
   dateKey: string;
+  assignmentType: AssignmentType;
 }): Promise<void> {
   const isWeekly = params.scheduleType === "weekly";
+  const isShared = params.assignmentType === "shared";
 
   const { error } = await createClient().from("tasks").insert({
     household_id: params.householdId,
     created_by: params.userId,
-    assigned_to: params.userId,
+    // تسک مشترک صاحب ندارد — قید دیتابیس هم همین را می‌خواهد
+    assigned_to: isShared ? null : params.userId,
+    assignment_type: params.assignmentType,
     title: params.title.trim(),
     category_id: params.categoryId,
     priority: params.priority,

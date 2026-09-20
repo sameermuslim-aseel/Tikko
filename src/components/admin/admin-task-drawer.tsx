@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Drawer,
@@ -89,6 +89,36 @@ export function AdminTaskDrawer({
     onError: (err) => setError(err.message),
   });
 
+  // آخرین @ که هنوز تمام نشده — مثل «بردن زباله @حس»
+  const mentionMatch = title.match(/@([^\s@]*)$/);
+  const mention = mentionMatch ? mentionMatch[1] : null;
+
+  const mentionOptions =
+    mention === null
+      ? []
+      : [
+          ...(members ?? []).map((m) => ({
+            id: m.id,
+            label: m.display_name ?? "بی‌نام",
+          })),
+          { id: "shared", label: "مشترک — هر کی زودتر" },
+        ].filter((option) =>
+          mention === "" ? true : option.label.includes(mention),
+        );
+
+  function applyMention(option: { id: string; label: string }) {
+    if (option.id === "shared") {
+      setAssignmentType("shared");
+      setAssignedTo(null);
+    } else {
+      setAssignmentType("one");
+      setAssignedTo(option.id);
+    }
+
+    // خود @ و متنی که تایپ شده از عنوان پاک می‌شود
+    setTitle(title.replace(/@[^\s@]*$/, "").trimEnd());
+  }
+
   function reset() {
     setTitle("");
     setAssignedTo(null);
@@ -154,10 +184,52 @@ export function AdminTaskDrawer({
                 id="admin-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="مثلاً: بردن زباله"
+                placeholder="مثلاً: بردن زباله @حسنا"
                 required
                 autoFocus
+                autoComplete="off"
               />
+
+              {/*
+                نوشتن @ فهرست اعضا را باز می‌کند تا بدون رفتن به چیپ‌های
+                پایین، همان‌جا مسئول تسک انتخاب شود.
+              */}
+              {mention !== null && (
+                <ul className="flex flex-col overflow-hidden rounded-lg border">
+                  {mentionOptions.length === 0 && (
+                    <li className="px-4 py-2 text-xs text-muted-foreground">
+                      کسی با این نام نیست
+                    </li>
+                  )}
+
+                  {mentionOptions.map((option) => (
+                    <li key={option.id}>
+                      <button
+                        type="button"
+                        onClick={() => applyMention(option)}
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-right text-sm hover:bg-muted"
+                      >
+                        {option.id === "shared" ? (
+                          <Users className="size-4 text-muted-foreground" />
+                        ) : (
+                          <span className="flex size-6 items-center justify-center rounded-full bg-muted text-xs">
+                            {[...(option.label ?? "")][0]}
+                          </span>
+                        )}
+                        {option.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* mention ممکن است رشتهٔ خالی باشد (تازه @ زده) — آن هم یعنی باز است */}
+              {mention === null && (
+                <p className="text-xs text-muted-foreground">
+                  با نوشتن <span className="text-foreground">@</span> می‌توانی
+                  مسئول تسک را انتخاب کنی.
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col gap-2">

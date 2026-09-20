@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, SlidersHorizontal } from "lucide-react";
+import { ListChecks, Plus, SlidersHorizontal } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Drawer,
@@ -100,6 +100,7 @@ export function AddTaskDrawer({
         weekdays: [],
         dateKey: targetDate,
         assignmentType: "one",
+        taskType,
       });
     },
     onSuccess: () => {
@@ -216,6 +217,39 @@ export function AddTaskDrawer({
               این دکمه تنها راه رسیدن به کتگوری، تکرار و تسک مشترک است؛
               اگر کم‌رنگ باشد کاربر فکر می‌کند اپ این امکانات را ندارد.
             */}
+            {/*
+              میان‌بر: بدون باز کردن جزئیات هم می‌شود تسک لیستی ساخت.
+              بعد از ذخیره، آیتم‌ها از خود تسک اضافه می‌شوند.
+            */}
+            {!showDetails && (
+              <button
+                type="button"
+                onClick={() =>
+                  setTaskType(taskType === "list" ? "simple" : "list")
+                }
+                aria-pressed={taskType === "list"}
+                className={`flex h-12 w-full items-center justify-between rounded-lg border px-4 text-sm font-medium transition-colors ${
+                  taskType === "list"
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-input hover:bg-muted"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <ListChecks className="size-4" />
+                  تسک لیستی
+                </span>
+                <span
+                  className={`text-xs font-normal ${
+                    taskType === "list"
+                      ? "text-background/70"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {taskType === "list" ? "بعد آیتم اضافه کن" : "چند آیتم داخلش"}
+                </span>
+              </button>
+            )}
+
             {!showDetails && (
               <button
                 type="button"

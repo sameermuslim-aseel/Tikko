@@ -104,14 +104,16 @@ body {
     روشنی هر دو حدود ۰٫۵۵ تا هم روی سفید خوانا باشند و هم متن سفید
     رویشان.
   */
-  --success: oklch(0.55 0.15 145);
+  /* «انجام شد» همان رنگ برند است — تیک، نوار پیشرفت و استریک
+     همگی سبزآبی می‌شوند تا اپ یک زبان رنگی واحد داشته باشد. */
+  --success: oklch(0.6054 0.1064 184.9);
   --success-foreground: oklch(1 0 0);
 
   --attention: oklch(0.58 0.14 65);
   --attention-foreground: oklch(1 0 0);
 
   --chart-1: oklch(0.6054 0.1064 184.9);
-  --chart-2: oklch(0.55 0.15 145);
+  --chart-2: oklch(0.45 0.09 184.9);
   --chart-3: oklch(0.58 0.14 65);
   --chart-4: oklch(0.53 0 0);
   --chart-5: oklch(0.3 0 0);
@@ -163,14 +165,14 @@ body {
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.72 0.11 184.9);
 
-  --success: oklch(0.7 0.15 145);
-  --success-foreground: oklch(0.18 0.03 145);
+  --success: oklch(0.72 0.11 184.9);
+  --success-foreground: oklch(0.18 0.03 184.9);
 
   --attention: oklch(0.74 0.14 65);
   --attention-foreground: oklch(0.18 0.03 65);
 
   --chart-1: oklch(0.72 0.11 184.9);
-  --chart-2: oklch(0.7 0.15 145);
+  --chart-2: oklch(0.6 0.1 184.9);
   --chart-3: oklch(0.74 0.14 65);
   --chart-4: oklch(0.72 0 0);
   --chart-5: oklch(0.96 0 0);

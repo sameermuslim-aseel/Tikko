@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ListChecks, Trash2 } from "lucide-react";
+import { ListChecks, Pencil, Trash2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminKeys, fetchAdminTasks, fetchMembers } from "@/lib/queries/admin";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
 import { deleteTask } from "@/lib/queries/tasks";
 import { WEEKDAY_LABELS } from "@/components/tasks/weekday-picker";
 import { TaskItemsList } from "@/components/tasks/task-items-list";
+import { EditTaskDrawer } from "@/components/tasks/edit-task-drawer";
 import {
   Drawer,
   DrawerContent,
@@ -28,6 +29,7 @@ export function AdminTaskList({ userId }: { userId: string }) {
   const [memberFilter, setMemberFilter] = useState<string | null>(null);
   const [priorityFilter, setPriorityFilter] = useState<Priority | null>(null);
   const [itemsTask, setItemsTask] = useState<AdminTask | null>(null);
+  const [editTaskId, setEditTaskId] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -159,6 +161,16 @@ export function AdminTaskList({ userId }: { userId: string }) {
               </span>
             </div>
 
+            <button
+              type="button"
+              onClick={() => setEditTaskId(task.id)}
+              aria-label={`ویرایش ${task.title}`}
+              title="ویرایش"
+              className="flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground"
+            >
+              <Pencil className="size-4" />
+            </button>
+
             {/* تسک لیستی بدون آیتم بی‌فایده است؛ ادمین باید بتواند پرش کند */}
             {task.task_type === "list" && (
               <button
@@ -216,6 +228,12 @@ export function AdminTaskList({ userId }: { userId: string }) {
           </div>
         </DrawerContent>
       </Drawer>
+
+      <EditTaskDrawer
+        taskId={editTaskId}
+        role="admin"
+        onClose={() => setEditTaskId(null)}
+      />
     </section>
   );
 }

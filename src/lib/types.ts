@@ -19,6 +19,7 @@ export type TaskForDate = {
   assigned_to: string | null;
   assignment_type: AssignmentType;
   task_type: TaskType;
+  created_by: string;
   category_id: string | null;
   category_name: string | null;
   category_color: string | null;

@@ -4,6 +4,7 @@ import type {
   Priority,
   ScheduleType,
   TaskForDate,
+  TaskType,
 } from "@/lib/types";
 
 /** تسک‌های یک روز برای کاربر جاری */
@@ -64,6 +65,7 @@ export async function createSelfTask(params: {
   weekdays: number[];
   dateKey: string;
   assignmentType: AssignmentType;
+  taskType?: TaskType;
 }): Promise<void> {
   const isWeekly = params.scheduleType === "weekly";
   const isShared = params.assignmentType === "shared";
@@ -74,6 +76,7 @@ export async function createSelfTask(params: {
     // تسک مشترک صاحب ندارد — قید دیتابیس هم همین را می‌خواهد
     assigned_to: isShared ? null : params.userId,
     assignment_type: params.assignmentType,
+    task_type: params.taskType ?? "simple",
     title: params.title.trim(),
     category_id: params.categoryId,
     priority: params.priority,

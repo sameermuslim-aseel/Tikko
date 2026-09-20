@@ -4,6 +4,7 @@ import type {
   Priority,
   Role,
   ScheduleType,
+  TaskType,
 } from "@/lib/types";
 
 export type Member = {
@@ -86,6 +87,7 @@ export async function createAdminTask(params: {
   weekdays: number[];
   dateKey: string;
   assignmentType: AssignmentType;
+  taskType?: TaskType;
 }): Promise<void> {
   const isWeekly = params.scheduleType === "weekly";
   const isShared = params.assignmentType === "shared";
@@ -95,6 +97,7 @@ export async function createAdminTask(params: {
     created_by: params.createdBy,
     assigned_to: isShared ? null : params.assignedTo,
     assignment_type: params.assignmentType,
+    task_type: params.taskType ?? "simple",
     title: params.title.trim(),
     category_id: params.categoryId,
     priority: params.priority,

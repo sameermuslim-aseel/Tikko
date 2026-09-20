@@ -21,7 +21,12 @@ import { parseQuickTask } from "@/lib/quick-parse";
 import { addDays } from "date-fns";
 import { toDateKey } from "@/lib/date";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
-import type { AssignmentType, Priority, ScheduleType } from "@/lib/types";
+import type {
+  AssignmentType,
+  Priority,
+  ScheduleType,
+  TaskType,
+} from "@/lib/types";
 
 const PRIORITIES: { value: Priority; label: string }[] = [
   { value: "low", label: "کم" },
@@ -48,6 +53,7 @@ export function AddTaskDrawer({
   const [scheduleType, setScheduleType] = useState<ScheduleType>("once");
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [assignmentType, setAssignmentType] = useState<AssignmentType>("one");
+  const [taskType, setTaskType] = useState<TaskType>("simple");
   // پیش‌فرض: فقط یک فیلد متن. زیر ۵ ثانیه (PLAN-PHASE2 بخش ۲.۵)
   const [showDetails, setShowDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +79,7 @@ export function AddTaskDrawer({
           weekdays,
           dateKey,
           assignmentType,
+          taskType,
         });
       }
 
@@ -112,6 +119,7 @@ export function AddTaskDrawer({
     setScheduleType("once");
     setWeekdays([]);
     setAssignmentType("one");
+    setTaskType("simple");
     setShowDetails(false);
     setError(null);
   }
@@ -275,6 +283,37 @@ export function AddTaskDrawer({
                 </div>
               </div>
             )}
+
+            <div className="flex flex-col gap-2">
+              <Label>نوع تسک</Label>
+              <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
+                {(
+                  [
+                    ["simple", "ساده"],
+                    ["list", "لیستی"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setTaskType(value)}
+                    className={`h-10 rounded-md text-sm transition-colors ${
+                      taskType === value
+                        ? "bg-background font-medium shadow-sm"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {taskType === "list" && (
+                <p className="text-xs text-muted-foreground">
+                  داخلش آیتم اضافه می‌کنی (مثلاً نماز: صبح، چاشت، عصر…) و هر
+                  روز جداگانه تیک می‌خورند.
+                </p>
+              )}
+            </div>
 
             <div className="flex flex-col gap-2">
               <Label>برای کی</Label>

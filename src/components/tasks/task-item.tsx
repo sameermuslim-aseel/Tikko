@@ -1,7 +1,14 @@
 "use client";
 
-import { Check, Ellipsis, MessageSquareText, Minus, Users } from "lucide-react";
-import { relativeDayLabel } from "@/lib/date";
+import {
+  Check,
+  Ellipsis,
+  ListChecks,
+  MessageSquareText,
+  Minus,
+  Users,
+} from "lucide-react";
+import { formatNumber, relativeDayLabel } from "@/lib/date";
 import type { TaskForDate } from "@/lib/types";
 
 export function TaskItem({
@@ -16,6 +23,8 @@ export function TaskItem({
   disabled?: boolean;
 }) {
   const isSkipped = task.status === "skipped";
+  // تسک لیستی با تیک زدن آیتم‌هایش کامل می‌شود، نه با یک لمس روی خودش
+  const isList = task.task_type === "list";
 
   return (
     // div بیرونی است چون دکمه داخل دکمه HTML نامعتبر است
@@ -26,8 +35,8 @@ export function TaskItem({
     >
       <button
         type="button"
-        onClick={() => onToggle(task)}
-        disabled={disabled}
+        onClick={() => (isList ? onOpenDetail(task) : onToggle(task))}
+        disabled={disabled && !isList}
         aria-pressed={task.is_completed}
         className="flex min-w-0 flex-1 items-center gap-3 p-3 text-right"
       >
@@ -69,6 +78,12 @@ export function TaskItem({
             )}
             {task.time_of_day && (
               <span dir="ltr">{task.time_of_day.slice(0, 5)}</span>
+            )}
+            {isList && (
+              <span className="flex items-center gap-1">
+                <ListChecks className="size-3" />
+                {formatNumber(task.items_done)}/{formatNumber(task.items_total)}
+              </span>
             )}
             {isSkipped && <span>رد شد</span>}
             {task.source === "admin" && <span>تعیین‌شده</span>}

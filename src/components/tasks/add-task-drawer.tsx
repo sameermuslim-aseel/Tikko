@@ -170,7 +170,7 @@ export function AddTaskDrawer({
               type="button"
               aria-label="تسک جدید"
               // bottom-20 تا بالای نوار ناوبری پایین بماند و پشت آن نرود
-              className="pointer-events-auto absolute bottom-20 left-6 flex size-14 items-center justify-center rounded-full bg-foreground text-background shadow-lg"
+              className="pointer-events-auto absolute bottom-20 left-6 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
             >
               <Plus className="size-6" />
             </button>
@@ -239,7 +239,7 @@ export function AddTaskDrawer({
                 aria-pressed={taskType === "list"}
                 className={`flex h-12 w-full items-center justify-between rounded-lg border px-4 text-sm font-medium transition-colors ${
                   taskType === "list"
-                    ? "border-foreground bg-foreground text-background"
+                    ? "border-primary bg-primary text-primary-foreground"
                     : "border-input hover:bg-muted"
                 }`}
               >
@@ -293,7 +293,7 @@ export function AddTaskDrawer({
                     aria-pressed={priority === p.value}
                     className={`h-11 rounded-lg border text-sm transition-colors ${
                       priority === p.value
-                        ? "border-foreground bg-foreground text-background"
+                        ? "border-primary bg-primary text-primary-foreground"
                         : "border-input text-muted-foreground"
                     }`}
                   >
@@ -317,7 +317,7 @@ export function AddTaskDrawer({
                       aria-pressed={categoryId === c.id}
                       className={`flex h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors ${
                         categoryId === c.id
-                          ? "border-foreground"
+                          ? "border-primary"
                           : "border-input text-muted-foreground"
                       }`}
                     >

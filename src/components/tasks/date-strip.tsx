@@ -38,8 +38,8 @@ export function DateStrip({
               isSelected
                 ? isFuture
                   // انتخاب‌شده ولی هنوز نرسیده: حاشیه دارد اما پُر نیست
-                  ? "border-foreground/40 bg-transparent text-muted-foreground"
-                  : "border-foreground bg-foreground text-background"
+                  ? "border-primary/40 bg-transparent text-muted-foreground"
+                  : "border-primary bg-primary text-primary-foreground"
                 : isFuture
                   ? "border-transparent bg-muted/50 text-muted-foreground/50"
                   : "border-transparent bg-muted text-foreground"
@@ -50,7 +50,7 @@ export function DateStrip({
             {isToday && (
               <span
                 className={`h-1 w-1 rounded-full ${
-                  isSelected ? "bg-background" : "bg-foreground"
+                  isSelected ? "bg-background" : "bg-primary"
                 }`}
               />
             )}

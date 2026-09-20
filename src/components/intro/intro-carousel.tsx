@@ -99,7 +99,7 @@ export function IntroCarousel({
             aria-label={`صفحهٔ ${i + 1}`}
             aria-current={i === index}
             className={`h-2 rounded-full transition-all ${
-              i === index ? "w-6 bg-foreground" : "w-2 bg-muted-foreground/30"
+              i === index ? "w-6 bg-primary" : "w-2 bg-muted-foreground/30"
             }`}
           />
         ))}

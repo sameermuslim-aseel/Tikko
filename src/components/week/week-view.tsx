@@ -171,7 +171,7 @@ export function WeekView({ userId }: { userId: string }) {
             <section
               key={key}
               className={`rounded-xl border ${
-                isToday ? "border-foreground" : ""
+                isToday ? "border-primary" : ""
               }`}
             >
               <header className="flex items-center justify-between px-4 py-3">
@@ -183,7 +183,7 @@ export function WeekView({ userId }: { userId: string }) {
                     {formatDayNumber(day)}
                   </span>
                   {isToday && (
-                    <span className="rounded-full bg-foreground px-2 py-0.5 text-[10px] text-background">
+                    <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] text-background">
                       امروز
                     </span>
                   )}

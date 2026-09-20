@@ -59,70 +59,73 @@ body {
 
 :root {
   /*
-    رنگ اصلی اپ: #9A6735 — قهوه‌ای گرم.
-    در oklch نوشته می‌شود تا روشنی و اشباعش مستقل قابل تنظیم باشد،
-    و خنثی‌ها با همان hue کمی گرم شده‌اند تا کل اپ یکدست دیده شود.
-  */
-  --brand-hue: 62.5;
+    رنگ اصلی اپ: #02968A — سبزآبی.
+    در oklch نوشته می‌شود تا برای تم تاریک فقط روشنی‌اش بالا برود
+    بدون اینکه رنگ عوض شود.
 
-  --background: oklch(0.99 0.004 62.5);
-  --foreground: oklch(0.23 0.015 62.5);
+    خنثی‌ها عمداً بی‌رنگ‌اند: اگر خاکستری‌ها را هم با همین hue رنگی
+    کنیم، کل صفحه ته‌رنگ می‌گیرد و رنگ برند دیگر جایی برای دیده شدن
+    ندارد.
+  */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.2 0 0);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.23 0.015 62.5);
+  --card-foreground: oklch(0.2 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.23 0.015 62.5);
+  --popover-foreground: oklch(0.2 0 0);
 
-  /* #9A6735 */
-  --primary: oklch(0.5575 0.093 62.5);
-  --primary-foreground: oklch(0.99 0.005 62.5);
+  /* #02968A */
+  --primary: oklch(0.6054 0.1064 184.9);
+  --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.955 0.008 62.5);
-  --secondary-foreground: oklch(0.3 0.02 62.5);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.25 0 0);
 
-  --muted: oklch(0.96 0.006 62.5);
-  --muted-foreground: oklch(0.52 0.02 62.5);
+  --muted: oklch(0.968 0 0);
+  --muted-foreground: oklch(0.53 0 0);
 
-  --accent: oklch(0.94 0.018 62.5);
-  --accent-foreground: oklch(0.3 0.03 62.5);
+  /* تنها خنثایی که ته‌رنگ برند دارد: زمینهٔ hover و حالت انتخاب‌شده */
+  --accent: oklch(0.955 0.015 184.9);
+  --accent-foreground: oklch(0.3 0.04 184.9);
 
   --destructive: oklch(0.577 0.245 27.3);
 
-  --border: oklch(0.9 0.008 62.5);
-  --input: oklch(0.9 0.008 62.5);
-  --ring: oklch(0.5575 0.093 62.5);
+  --border: oklch(0.915 0 0);
+  --input: oklch(0.915 0 0);
+  --ring: oklch(0.6054 0.1064 184.9);
 
   /*
-    رنگ‌های معنایی. تا حالا emerald و amber مستقیم در کامپوننت‌ها
-    نوشته شده بودند و در تم تاریک درست نمی‌شدند.
+    رنگ‌های معنایی.
+    «انجام شد» عمداً سبز چمنی (hue ۱۴۵) است نه زمردی: رنگ برند
+    خودش سبزآبی است و سبز نزدیک به آن با دکمه‌ها اشتباه می‌شد.
+    «عقب‌افتاده» کهربایی است — مکمل سبزآبی، پس کاملاً جدا دیده می‌شود.
 
-    روشنی هر دو حدود ۰٫۵۳ است تا هم روی سفید خوانا باشند و هم
-    متن سفید رویشان — یک توکن برای هر دو کاربرد کافی است.
+    روشنی هر دو حدود ۰٫۵۵ تا هم روی سفید خوانا باشند و هم متن سفید
+    رویشان.
   */
-  --success: oklch(0.54 0.14 155);
-  --success-foreground: oklch(0.99 0 0);
+  --success: oklch(0.55 0.15 145);
+  --success-foreground: oklch(1 0 0);
 
-  /* نارنجی برای «عقب‌افتاده». عمداً hue ۴۵ نه ۷۵، وگرنه با
-     قهوه‌ای برند اشتباه گرفته می‌شد. */
-  --attention: oklch(0.55 0.15 45);
-  --attention-foreground: oklch(0.99 0 0);
+  --attention: oklch(0.58 0.14 65);
+  --attention-foreground: oklch(1 0 0);
 
-  --chart-1: oklch(0.5575 0.093 62.5);
-  --chart-2: oklch(0.54 0.14 155);
-  --chart-3: oklch(0.55 0.15 45);
-  --chart-4: oklch(0.52 0.02 62.5);
-  --chart-5: oklch(0.3 0.02 62.5);
+  --chart-1: oklch(0.6054 0.1064 184.9);
+  --chart-2: oklch(0.55 0.15 145);
+  --chart-3: oklch(0.58 0.14 65);
+  --chart-4: oklch(0.53 0 0);
+  --chart-5: oklch(0.3 0 0);
 
   --radius: 0.625rem;
 
-  --sidebar: oklch(0.99 0.004 62.5);
-  --sidebar-foreground: oklch(0.23 0.015 62.5);
-  --sidebar-primary: oklch(0.5575 0.093 62.5);
-  --sidebar-primary-foreground: oklch(0.99 0.005 62.5);
-  --sidebar-accent: oklch(0.94 0.018 62.5);
-  --sidebar-accent-foreground: oklch(0.3 0.03 62.5);
-  --sidebar-border: oklch(0.9 0.008 62.5);
-  --sidebar-ring: oklch(0.5575 0.093 62.5);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.2 0 0);
+  --sidebar-primary: oklch(0.6054 0.1064 184.9);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.955 0.015 184.9);
+  --sidebar-accent-foreground: oklch(0.3 0.04 184.9);
+  --sidebar-border: oklch(0.915 0 0);
+  --sidebar-ring: oklch(0.6054 0.1064 184.9);
 }
 
 body {
@@ -131,89 +134,55 @@ body {
   overscroll-behavior-y: none;
 }
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
 
 .dark {
-  --background: oklch(0.18 0.008 62.5);
-  --foreground: oklch(0.96 0.005 62.5);
+  --background: oklch(0.17 0 0);
+  --foreground: oklch(0.96 0 0);
 
-  --card: oklch(0.22 0.01 62.5);
-  --card-foreground: oklch(0.96 0.005 62.5);
-  --popover: oklch(0.22 0.01 62.5);
-  --popover-foreground: oklch(0.96 0.005 62.5);
+  --card: oklch(0.21 0 0);
+  --card-foreground: oklch(0.96 0 0);
+  --popover: oklch(0.21 0 0);
+  --popover-foreground: oklch(0.96 0 0);
 
-  /* روی زمینهٔ تیره، همان قهوه‌ای روشن‌تر می‌شود تا خوانا بماند */
-  --primary: oklch(0.7 0.1 62.5);
-  --primary-foreground: oklch(0.2 0.02 62.5);
+  /* روی زمینهٔ تیره روشن‌تر می‌شود تا خوانا بماند */
+  --primary: oklch(0.72 0.11 184.9);
+  --primary-foreground: oklch(0.18 0.03 184.9);
 
-  --secondary: oklch(0.27 0.012 62.5);
-  --secondary-foreground: oklch(0.96 0.005 62.5);
+  --secondary: oklch(0.27 0 0);
+  --secondary-foreground: oklch(0.96 0 0);
 
-  --muted: oklch(0.27 0.012 62.5);
-  --muted-foreground: oklch(0.72 0.02 62.5);
+  --muted: oklch(0.27 0 0);
+  --muted-foreground: oklch(0.72 0 0);
 
-  --accent: oklch(0.32 0.02 62.5);
-  --accent-foreground: oklch(0.96 0.005 62.5);
+  --accent: oklch(0.3 0.03 184.9);
+  --accent-foreground: oklch(0.96 0 0);
 
   --destructive: oklch(0.65 0.2 27.3);
 
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.7 0.1 62.5);
+  --ring: oklch(0.72 0.11 184.9);
 
-  --success: oklch(0.7 0.14 155);
-  --success-foreground: oklch(0.2 0.02 155);
+  --success: oklch(0.7 0.15 145);
+  --success-foreground: oklch(0.18 0.03 145);
 
-  --attention: oklch(0.72 0.15 45);
-  --attention-foreground: oklch(0.2 0.02 45);
+  --attention: oklch(0.74 0.14 65);
+  --attention-foreground: oklch(0.18 0.03 65);
 
-  --chart-1: oklch(0.7 0.1 62.5);
-  --chart-2: oklch(0.7 0.14 155);
-  --chart-3: oklch(0.72 0.15 45);
-  --chart-4: oklch(0.72 0.02 62.5);
-  --chart-5: oklch(0.96 0.005 62.5);
+  --chart-1: oklch(0.72 0.11 184.9);
+  --chart-2: oklch(0.7 0.15 145);
+  --chart-3: oklch(0.74 0.14 65);
+  --chart-4: oklch(0.72 0 0);
+  --chart-5: oklch(0.96 0 0);
 
-  --sidebar: oklch(0.22 0.01 62.5);
-  --sidebar-foreground: oklch(0.96 0.005 62.5);
-  --sidebar-primary: oklch(0.7 0.1 62.5);
-  --sidebar-primary-foreground: oklch(0.2 0.02 62.5);
-  --sidebar-accent: oklch(0.32 0.02 62.5);
-  --sidebar-accent-foreground: oklch(0.96 0.005 62.5);
+  --sidebar: oklch(0.21 0 0);
+  --sidebar-foreground: oklch(0.96 0 0);
+  --sidebar-primary: oklch(0.72 0.11 184.9);
+  --sidebar-primary-foreground: oklch(0.18 0.03 184.9);
+  --sidebar-accent: oklch(0.3 0.03 184.9);
+  --sidebar-accent-foreground: oklch(0.96 0 0);
   --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.7 0.1 62.5);
+  --sidebar-ring: oklch(0.72 0.11 184.9);
 }
 
 @layer base {

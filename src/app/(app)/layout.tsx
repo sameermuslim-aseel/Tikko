@@ -39,7 +39,7 @@ export default async function AppLayout({
         >
           <span
             aria-hidden
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground text-sm font-semibold text-background"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-background"
           >
             {initial}
           </span>

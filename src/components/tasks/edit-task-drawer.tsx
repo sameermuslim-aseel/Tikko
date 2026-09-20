@@ -142,7 +142,7 @@ function EditForm({
                   }}
                   className={`h-11 rounded-full border px-4 text-sm transition-colors ${
                     assignmentType === "one" && assignedTo === m.id
-                      ? "border-foreground bg-foreground text-background"
+                      ? "border-primary bg-primary text-primary-foreground"
                       : "border-input text-muted-foreground"
                   }`}
                 >
@@ -158,7 +158,7 @@ function EditForm({
                 }}
                 className={`h-11 rounded-full border px-4 text-sm transition-colors ${
                   assignmentType === "shared"
-                    ? "border-foreground bg-foreground text-background"
+                    ? "border-primary bg-primary text-primary-foreground"
                     : "border-input text-muted-foreground"
                 }`}
               >
@@ -178,7 +178,7 @@ function EditForm({
                 onClick={() => setPriority(p.value)}
                 className={`h-11 rounded-lg border text-sm transition-colors ${
                   priority === p.value
-                    ? "border-foreground bg-foreground text-background"
+                    ? "border-primary bg-primary text-primary-foreground"
                     : "border-input text-muted-foreground"
                 }`}
               >
@@ -199,7 +199,7 @@ function EditForm({
                   onClick={() => setCategoryId(categoryId === c.id ? null : c.id)}
                   className={`flex h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors ${
                     categoryId === c.id
-                      ? "border-foreground"
+                      ? "border-primary"
                       : "border-input text-muted-foreground"
                   }`}
                 >

@@ -152,6 +152,10 @@ async function handle(request: Request): Promise<Response> {
   }
 
   let sentCount = 0;
+  // خطاهای ارسال در پاسخ برمی‌گردند، وگرنه فقط در لاگ می‌مانند و
+  // از SQL دیده نمی‌شوند — در حالی که پیام در اپ ثبت شده و به نظر
+  // می‌رسد همه‌چیز درست کار کرده
+  const pushErrors: string[] = [];
 
   async function send(
     userId: string,
@@ -185,8 +189,10 @@ async function handle(request: Request): Promise<Response> {
         // 404/410 یعنی اشتراک منقضی شده — پاکش کن
         if (status === 404 || status === 410) {
           await supabase.from("push_subscriptions").delete().eq("id", sub.id);
+          pushErrors.push(`${status} — اشتراک منقضی بود و پاک شد`);
         } else {
-          console.error("push failed", sub.endpoint, status, String(error));
+          const body = (error as { body?: string }).body;
+          pushErrors.push(`${status ?? "?"} — ${body ?? String(error)}`);
         }
       }
     }
@@ -302,5 +308,11 @@ async function handle(request: Request): Promise<Response> {
     }
   }
 
-  return Response.json({ ok: true, sent: sentCount, at: kabulNow.toISOString() });
+  return Response.json({
+    ok: true,
+    sent: sentCount,
+    subscriptions: (subscriptions ?? []).length,
+    errors: pushErrors,
+    at: kabulNow.toISOString(),
+  });
 }

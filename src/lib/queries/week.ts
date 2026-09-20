@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/client";
-import type { CompletionStatus, Priority, TaskSource } from "@/lib/types";
+import type {
+  AssignmentType,
+  CompletionStatus,
+  Priority,
+  TaskSource,
+} from "@/lib/types";
 
 /** یک «نمونه» از تسک در یک روز مشخص */
 export type RangeTask = {
@@ -8,6 +13,7 @@ export type RangeTask = {
   title: string;
   priority: Priority;
   source: TaskSource;
+  assignment_type: AssignmentType;
   time_of_day: string | null;
   category_name: string | null;
   category_color: string | null;

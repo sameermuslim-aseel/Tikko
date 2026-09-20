@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Ellipsis, MessageSquareText, Minus } from "lucide-react";
+import { Check, Ellipsis, MessageSquareText, Minus, Users } from "lucide-react";
 import { relativeDayLabel } from "@/lib/date";
 import type { TaskForDate } from "@/lib/types";
 
@@ -72,6 +72,20 @@ export function TaskItem({
             )}
             {isSkipped && <span>رد شد</span>}
             {task.source === "admin" && <span>تعیین‌شده</span>}
+
+            {/* تسک مشترک: قبل از انجام «مشترک»، بعد از انجام اسم کسی که کرد */}
+            {task.assignment_type === "shared" &&
+              (task.is_completed && task.completed_by_name ? (
+                <span className="flex items-center gap-1">
+                  <Users className="size-3" />
+                  {task.completed_by_name}
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Users className="size-3" />
+                  مشترک
+                </span>
+              ))}
 
             {/* از کدام روز عقب افتاده بود — وگرنه در لیست امروز گم می‌شود */}
             {task.deferred_from && !task.is_completed && (

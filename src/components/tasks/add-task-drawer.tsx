@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, SlidersHorizontal } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Drawer,
@@ -16,9 +16,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WeekdayPicker } from "./weekday-picker";
-import { createSelfTask, tasksQueryKey } from "@/lib/queries/tasks";
+import { createSelfTask } from "@/lib/queries/tasks";
+import { parseQuickTask } from "@/lib/quick-parse";
+import { addDays } from "date-fns";
+import { toDateKey } from "@/lib/date";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
-import type { Priority, ScheduleType } from "@/lib/types";
+import type { AssignmentType, Priority, ScheduleType } from "@/lib/types";
 
 const PRIORITIES: { value: Priority; label: string }[] = [
   { value: "low", label: "کم" },
@@ -30,17 +33,23 @@ export function AddTaskDrawer({
   householdId,
   userId,
   dateKey,
+  openOnMount = false,
 }: {
   householdId: string;
   userId: string;
   dateKey: string;
+  /** میان‌بر آیکون اپ: /?new=1 */
+  openOnMount?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(openOnMount);
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [priority, setPriority] = useState<Priority>("medium");
   const [scheduleType, setScheduleType] = useState<ScheduleType>("once");
   const [weekdays, setWeekdays] = useState<number[]>([]);
+  const [assignmentType, setAssignmentType] = useState<AssignmentType>("one");
+  // پیش‌فرض: فقط یک فیلد متن. زیر ۵ ثانیه (PLAN-PHASE2 بخش ۲.۵)
+  const [showDetails, setShowDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
@@ -52,19 +61,44 @@ export function AddTaskDrawer({
   });
 
   const create = useMutation({
-    mutationFn: () =>
-      createSelfTask({
+    mutationFn: () => {
+      if (showDetails) {
+        return createSelfTask({
+          householdId,
+          userId,
+          title,
+          categoryId,
+          priority,
+          scheduleType,
+          weekdays,
+          dateKey,
+          assignmentType,
+        });
+      }
+
+      // حالت سریع: بقیه پیش‌فرض، فقط دو قاعدهٔ «!» و «فردا»
+      const quick = parseQuickTask(title);
+      const targetDate =
+        quick.dayOffset === 1
+          ? toDateKey(addDays(new Date(`${dateKey}T00:00:00`), 1))
+          : dateKey;
+
+      return createSelfTask({
         householdId,
         userId,
-        title,
-        categoryId,
-        priority,
-        scheduleType,
-        weekdays,
-        dateKey,
-      }),
+        title: quick.title,
+        categoryId: null,
+        priority: quick.priority,
+        scheduleType: "once",
+        weekdays: [],
+        dateKey: targetDate,
+        assignmentType: "one",
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: tasksQueryKey(dateKey) });
+      // ممکن است تسک برای فردا ساخته شده باشد، پس همهٔ روزها تازه شوند
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["week"] });
       reset();
       setOpen(false);
     },
@@ -77,6 +111,8 @@ export function AddTaskDrawer({
     setPriority("medium");
     setScheduleType("once");
     setWeekdays([]);
+    setAssignmentType("one");
+    setShowDetails(false);
     setError(null);
   }
 
@@ -84,7 +120,12 @@ export function AddTaskDrawer({
     event.preventDefault();
     setError(null);
 
-    if (scheduleType === "weekly" && weekdays.length === 0) {
+    if (!showDetails && parseQuickTask(title).title === "") {
+      setError("عنوان تسک را بنویس.");
+      return;
+    }
+
+    if (showDetails && scheduleType === "weekly" && weekdays.length === 0) {
       setError("حداقل یک روز هفته را انتخاب کنید.");
       return;
     }
@@ -139,12 +180,52 @@ export function AddTaskDrawer({
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="مثلاً: آب دادن گل‌ها"
+                placeholder="مثلاً: نان بگیر فردا"
                 required
                 autoFocus
               />
+
+              {/*
+                مثال واقعی بهتر از توضیح قاعده است — کاربر باید ببیند
+                چه می‌نویسد و چه اتفاقی می‌افتد.
+              */}
+              {!showDetails && (
+                <div className="flex flex-col gap-1 rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
+                  <span>می‌توانی سریع‌تر بنویسی:</span>
+                  <span>
+                    <span className="text-foreground">نان بگیر فردا</span> ←
+                    تسک برای فردا ثبت می‌شود
+                  </span>
+                  <span>
+                    <span className="text-foreground">نان بگیر!</span> ← با
+                    اولویت زیاد ثبت می‌شود
+                  </span>
+                </div>
+              )}
             </div>
 
+            {/*
+              این دکمه تنها راه رسیدن به کتگوری، تکرار و تسک مشترک است؛
+              اگر کم‌رنگ باشد کاربر فکر می‌کند اپ این امکانات را ندارد.
+            */}
+            {!showDetails && (
+              <button
+                type="button"
+                onClick={() => setShowDetails(true)}
+                className="flex h-12 w-full items-center justify-between rounded-lg border border-input px-4 text-sm font-medium transition-colors hover:bg-muted"
+              >
+                <span className="flex items-center gap-2">
+                  <SlidersHorizontal className="size-4" />
+                  جزئیات بیشتر
+                </span>
+                <span className="text-xs font-normal text-muted-foreground">
+                  اولویت، کتگوری، تکرار
+                </span>
+              </button>
+            )}
+
+            {showDetails && (
+            <>
             <div className="flex flex-col gap-2">
               <Label>اولویت</Label>
               <div className="grid grid-cols-3 gap-2">
@@ -196,6 +277,37 @@ export function AddTaskDrawer({
             )}
 
             <div className="flex flex-col gap-2">
+              <Label>برای کی</Label>
+              <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
+                {(
+                  [
+                    ["one", "خودم"],
+                    ["shared", "مشترک"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setAssignmentType(value)}
+                    className={`h-10 rounded-md text-sm transition-colors ${
+                      assignmentType === value
+                        ? "bg-background font-medium shadow-sm"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {assignmentType === "shared" && (
+                <p className="text-xs text-muted-foreground">
+                  در لیست همه دیده می‌شود؛ هر کی زودتر انجام داد، برای همه
+                  انجام‌شده حساب می‌شود.
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2">
               <Label>تکرار</Label>
               <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
                 {(
@@ -222,6 +334,8 @@ export function AddTaskDrawer({
 
             {scheduleType === "weekly" && (
               <WeekdayPicker value={weekdays} onChange={setWeekdays} />
+            )}
+            </>
             )}
 
             {error && (

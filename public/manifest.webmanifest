@@ -26,5 +26,20 @@
       "sizes": "any",
       "type": "image/svg+xml"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "تسک جدید",
+      "short_name": "تسک جدید",
+      "description": "اضافه کردن سریع یک تسک",
+      "url": "/?new=1",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }

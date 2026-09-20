@@ -47,12 +47,15 @@ export function AdminTaskList() {
 
   const filtered = tasks?.filter(
     (t) =>
-      (!memberFilter || t.assigned_to === memberFilter) &&
+      (!memberFilter ||
+        t.assigned_to === memberFilter ||
+        t.assignment_type === "shared") &&
       (!priorityFilter || t.priority === priorityFilter),
   );
 
-  function memberName(id: string) {
-    return members?.find((m) => m.id === id)?.display_name ?? "—";
+  function assigneeLabel(task: { assigned_to: string | null; assignment_type: string }) {
+    if (task.assignment_type === "shared") return "مشترک";
+    return members?.find((m) => m.id === task.assigned_to)?.display_name ?? "—";
   }
 
   function categoryOf(id: string | null) {
@@ -120,7 +123,7 @@ export function AdminTaskList() {
               <span className="truncate text-sm font-medium">{task.title}</span>
 
               <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span>{memberName(task.assigned_to)}</span>
+                <span>{assigneeLabel(task)}</span>
 
                 {category && (
                   <span className="flex items-center gap-1">

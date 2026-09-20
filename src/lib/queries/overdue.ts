@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Priority, ScheduleType, TaskSource } from "@/lib/types";
+import type {
+  AssignmentType,
+  Priority,
+  ScheduleType,
+  TaskSource,
+} from "@/lib/types";
 
 /** یک تسک بلاتکلیف از روزهای گذشته */
 export type OverdueTask = {
@@ -9,6 +14,7 @@ export type OverdueTask = {
   priority: Priority;
   source: TaskSource;
   schedule_type: ScheduleType;
+  assignment_type: AssignmentType;
   category_name: string | null;
   category_color: string | null;
 };

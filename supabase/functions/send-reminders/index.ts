@@ -39,12 +39,41 @@ type Task = {
   is_completed: boolean;
 };
 
+/** خطا را به‌صورت متن قابل خواندن برمی‌گرداند تا در SQL دیده شود */
+function fail(message: string): Response {
+  console.error(message);
+  return new Response(message, {
+    status: 500,
+    headers: { "Content-Type": "text/plain; charset=utf-8" },
+  });
+}
+
+/** طول واقعی یک کلید base64url پس از رمزگشایی */
+function decodedLength(value: string): number {
+  try {
+    const normalized = value.trim().replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
+    return atob(padded).length;
+  } catch {
+    return -1;
+  }
+}
+
 function timeToMinutes(value: string): number {
   const [h, m] = value.split(":");
   return Number(h) * 60 + Number(m);
 }
 
 Deno.serve(async (request) => {
+  try {
+    return await handle(request);
+  } catch (error) {
+    // بدون این، هر خطای پیش‌بینی‌نشده فقط «Internal Server Error» می‌شود
+    return fail(`خطای پیش‌بینی‌نشده: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+async function handle(request: Request): Promise<Response> {
   // فقط cron اجازهٔ صدا زدن دارد
   const secret = Deno.env.get("CRON_SECRET");
   if (secret && request.headers.get("x-cron-secret") !== secret) {
@@ -56,7 +85,32 @@ Deno.serve(async (request) => {
   const vapidSubject = Deno.env.get("VAPID_SUBJECT") ?? "mailto:admin@tikko.app";
 
   if (!vapidPublic || !vapidPrivate) {
-    return new Response("VAPID keys missing", { status: 500 });
+    return fail("VAPID keys missing");
+  }
+
+  /*
+    کلیدها را قبل از دادن به web-push بررسی می‌کنیم.
+    پیام خطای خود کتابخانه فقط در لاگ می‌نشیند و در جدول
+    net._http_response به «Internal Server Error» تبدیل می‌شود —
+    یعنی برای عیب‌یابی از SQL هیچ سرنخی نمی‌ماند.
+
+    فقط طول را گزارش می‌دهیم، نه خود مقدار را.
+  */
+  const pubBytes = decodedLength(vapidPublic);
+  const privBytes = decodedLength(vapidPrivate);
+
+  if (pubBytes !== 65) {
+    return fail(
+      `VAPID_PUBLIC_KEY باید ۶۵ بایت باشد ولی ${pubBytes} بایت است ` +
+        `(طول رشته: ${vapidPublic.length}). مقدار درست حدود ۸۷ کاراکتر است.`,
+    );
+  }
+
+  if (privBytes !== 32) {
+    return fail(
+      `VAPID_PRIVATE_KEY باید ۳۲ بایت باشد ولی ${privBytes} بایت است ` +
+        `(طول رشته: ${vapidPrivate.length}). مقدار درست حدود ۴۳ کاراکتر است.`,
+    );
   }
 
   webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
@@ -249,4 +303,4 @@ Deno.serve(async (request) => {
   }
 
   return Response.json({ ok: true, sent: sentCount, at: kabulNow.toISOString() });
-});
+}

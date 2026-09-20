@@ -4,6 +4,7 @@ import type {
   Priority,
   ScheduleType,
   TaskForDate,
+  TaskSource,
   TaskType,
 } from "@/lib/types";
 
@@ -120,3 +121,71 @@ export async function deleteTask(taskId: string): Promise<void> {
 }
 
 export const tasksQueryKey = (dateKey: string) => ["tasks", dateKey] as const;
+
+/** کل ردیف تسک — فرم ویرایش به فیلدهایی نیاز دارد که نمای امروز برنمی‌گرداند */
+export type EditableTask = {
+  id: string;
+  title: string;
+  description: string | null;
+  priority: Priority;
+  source: TaskSource;
+  assignment_type: AssignmentType;
+  assigned_to: string | null;
+  task_type: TaskType;
+  category_id: string | null;
+  schedule_type: ScheduleType;
+  weekdays: number[] | null;
+  due_date: string | null;
+  time_of_day: string | null;
+  created_by: string;
+};
+
+export async function fetchTask(taskId: string): Promise<EditableTask> {
+  const { data, error } = await createClient()
+    .from("tasks")
+    .select(
+      "id, title, description, priority, source, assignment_type, assigned_to, task_type, category_id, schedule_type, weekdays, due_date, time_of_day, created_by",
+    )
+    .eq("id", taskId)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data as EditableTask;
+}
+
+/**
+ * ویرایش تسک. RLS تصمیم می‌گیرد چه کسی اجازه دارد —
+ * ادمین همه، عضو فقط تسک‌های self خودش.
+ */
+export async function updateTask(params: {
+  taskId: string;
+  title: string;
+  priority: Priority;
+  categoryId: string | null;
+  assignmentType: AssignmentType;
+  assignedTo: string | null;
+  scheduleType: ScheduleType;
+  weekdays: number[];
+  dueDate: string | null;
+}): Promise<void> {
+  const isWeekly = params.scheduleType === "weekly";
+  const isShared = params.assignmentType === "shared";
+
+  const { error } = await createClient()
+    .from("tasks")
+    .update({
+      title: params.title.trim(),
+      priority: params.priority,
+      category_id: params.categoryId,
+      assignment_type: params.assignmentType,
+      assigned_to: isShared ? null : params.assignedTo,
+      schedule_type: params.scheduleType,
+      weekdays: isWeekly ? params.weekdays : null,
+      due_date: isWeekly ? null : params.dueDate,
+    })
+    .eq("id", params.taskId);
+
+  if (error) throw new Error(error.message);
+}
+
+export const taskQueryKey = (taskId: string) => ["task", taskId] as const;

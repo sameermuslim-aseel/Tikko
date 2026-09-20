@@ -86,12 +86,14 @@ export function TaskDetailDrawer({
   dateKey,
   role,
   userId,
+  onEdit,
   onClose,
 }: {
   task: TaskForDate | null;
   dateKey: string;
   role: Role;
   userId: string;
+  onEdit: (taskId: string) => void;
   onClose: () => void;
 }) {
   const queryClient = useQueryClient();
@@ -106,7 +108,10 @@ export function TaskDetailDrawer({
 
   // همان قاعدهٔ RLS: ادمین همه را حذف می‌کند، عضو فقط تسک‌های self خودش.
   // UI نباید سخت‌گیرتر از دیتابیس باشد.
-  const canDelete = role === "admin" || task?.source === "self";
+  // ادمین همه را؛ عضو فقط تسکی که خودش ساخته. همان چیزی که RLS می‌گوید.
+  const isMine = task?.source === "self" && task?.created_by === userId;
+  const canDelete = role === "admin" || isMine;
+  const canEdit = canDelete;
 
   return (
     <Drawer open={task !== null} onOpenChange={(open) => !open && onClose()}>
@@ -193,6 +198,17 @@ export function TaskDetailDrawer({
           )}
 
           <DrawerFooter>
+            {canEdit && task && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onEdit(task.id)}
+                className="h-12 text-base"
+              >
+                ویرایش
+              </Button>
+            )}
+
             {canDelete && task && (
               <Button
                 type="button"

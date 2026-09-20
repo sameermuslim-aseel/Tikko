@@ -1,23 +1,15 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ProgressSection } from "@/components/admin/progress-section";
-import { AdminTaskList } from "@/components/admin/admin-task-list";
+import { getCurrentProfile } from "@/lib/supabase/user";
+import { MemberSections } from "@/components/admin/member-sections";
 import { CategoryManager } from "@/components/admin/category-manager";
 import { AdminTaskDrawer } from "@/components/admin/admin-task-drawer";
 
 /** داشبورد ادمین — گارد نقش سمت سرور (PLAN بخش ۶، مرحلهٔ ۴) */
 export default async function AdminPage() {
+  // همان پروفایلی که layout گرفته — cache() دوباره کوئری نمی‌زند
+  const profile = await getCurrentProfile();
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, household_id")
-    .eq("id", user!.id)
-    .single();
 
   // عضو عادی اصلاً نباید این صفحه را ببیند.
   // RLS هم جداگانه جلوی خواندن دادهٔ بقیه را می‌گیرد.
@@ -36,9 +28,7 @@ export default async function AdminPage() {
         <p className="text-sm text-muted-foreground">داشبورد ادمین</p>
       </header>
 
-      <ProgressSection />
-
-      <AdminTaskList userId={user!.id} />
+      <MemberSections userId={profile!.id} />
 
       <CategoryManager householdId={profile.household_id} />
 
@@ -58,7 +48,7 @@ export default async function AdminPage() {
 
       <AdminTaskDrawer
         householdId={profile.household_id}
-        userId={user!.id}
+        userId={profile!.id}
       />
     </div>
   );

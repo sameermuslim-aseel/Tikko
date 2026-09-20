@@ -1,13 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { WeekView } from "@/components/week/week-view";
 
 /** نمای هفتگی — شنبه تا جمعه (فاز ۲) */
 export default async function WeekPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   return (
     <div className="flex flex-1 flex-col gap-4 py-4">

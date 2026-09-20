@@ -6,6 +6,7 @@ import { DateStrip } from "./date-strip";
 import { TaskItem } from "./task-item";
 import { AddTaskDrawer } from "./add-task-drawer";
 import { TaskDetailDrawer } from "./task-detail-drawer";
+import { EditTaskDrawer } from "./edit-task-drawer";
 import { StreakChip } from "@/components/stats/streak-chip";
 import { OverdueSection } from "./overdue-section";
 import {
@@ -29,6 +30,7 @@ export function TodayView({
 }) {
   const [selected, setSelected] = useState(() => new Date());
   const [detailTask, setDetailTask] = useState<TaskForDate | null>(null);
+  const [editTaskId, setEditTaskId] = useState<string | null>(null);
 
   const dateKey = toDateKey(selected);
   // روز آینده هنوز نرسیده؛ تیک زدنش هم در UI و هم در RLS بسته است
@@ -147,7 +149,18 @@ export function TodayView({
         dateKey={dateKey}
         role={role}
         userId={userId}
+        onEdit={(taskId) => {
+          // اول جزئیات بسته شود تا دو drawer روی هم نیفتند
+          setDetailTask(null);
+          setEditTaskId(taskId);
+        }}
         onClose={() => setDetailTask(null)}
+      />
+
+      <EditTaskDrawer
+        taskId={editTaskId}
+        role={role}
+        onClose={() => setEditTaskId(null)}
       />
     </div>
   );

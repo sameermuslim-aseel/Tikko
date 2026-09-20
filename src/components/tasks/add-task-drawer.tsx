@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WeekdayPicker } from "./weekday-picker";
 import { createSelfTask } from "@/lib/queries/tasks";
+import { addTaskItems } from "@/lib/queries/items";
+import { PendingItems } from "./pending-items";
 import { parseQuickTask } from "@/lib/quick-parse";
 import { addDays } from "date-fns";
 import { toDateKey } from "@/lib/date";
@@ -54,6 +56,7 @@ export function AddTaskDrawer({
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [assignmentType, setAssignmentType] = useState<AssignmentType>("one");
   const [taskType, setTaskType] = useState<TaskType>("simple");
+  const [pendingItems, setPendingItems] = useState<string[]>([]);
   // پیش‌فرض: فقط یک فیلد متن. زیر ۵ ثانیه (PLAN-PHASE2 بخش ۲.۵)
   const [showDetails, setShowDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,9 +70,9 @@ export function AddTaskDrawer({
   });
 
   const create = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (showDetails) {
-        return createSelfTask({
+        const taskId = await createSelfTask({
           householdId,
           userId,
           title,
@@ -81,6 +84,9 @@ export function AddTaskDrawer({
           assignmentType,
           taskType,
         });
+
+        if (taskType === "list") await addTaskItems(taskId, pendingItems);
+        return;
       }
 
       // حالت سریع: بقیه پیش‌فرض، فقط دو قاعدهٔ «!» و «فردا»
@@ -90,7 +96,7 @@ export function AddTaskDrawer({
           ? toDateKey(addDays(new Date(`${dateKey}T00:00:00`), 1))
           : dateKey;
 
-      return createSelfTask({
+      const taskId = await createSelfTask({
         householdId,
         userId,
         title: quick.title,
@@ -102,6 +108,8 @@ export function AddTaskDrawer({
         assignmentType: "one",
         taskType,
       });
+
+      if (taskType === "list") await addTaskItems(taskId, pendingItems);
     },
     onSuccess: () => {
       // ممکن است تسک برای فردا ساخته شده باشد، پس همهٔ روزها تازه شوند
@@ -121,6 +129,7 @@ export function AddTaskDrawer({
     setWeekdays([]);
     setAssignmentType("one");
     setTaskType("simple");
+    setPendingItems([]);
     setShowDetails(false);
     setError(null);
   }
@@ -248,6 +257,11 @@ export function AddTaskDrawer({
                   {taskType === "list" ? "بعد آیتم اضافه کن" : "چند آیتم داخلش"}
                 </span>
               </button>
+            )}
+
+            {/* آیتم‌ها همین‌جا نوشته می‌شوند تا تسک لیستی خالی ساخته نشود */}
+            {taskType === "list" && (
+              <PendingItems items={pendingItems} onChange={setPendingItems} />
             )}
 
             {!showDetails && (

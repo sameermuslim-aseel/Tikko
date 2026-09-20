@@ -89,11 +89,11 @@ export async function createAdminTask(params: {
   dateKey: string;
   assignmentType: AssignmentType;
   taskType?: TaskType;
-}): Promise<void> {
+}): Promise<string> {
   const isWeekly = params.scheduleType === "weekly";
   const isShared = params.assignmentType === "shared";
 
-  const { error } = await createClient().from("tasks").insert({
+  const { data, error } = await createClient().from("tasks").insert({
     household_id: params.householdId,
     created_by: params.createdBy,
     assigned_to: isShared ? null : params.assignedTo,
@@ -107,9 +107,12 @@ export async function createAdminTask(params: {
     due_date: isWeekly ? null : params.dateKey,
     weekdays: isWeekly ? params.weekdays : null,
     start_date: isWeekly ? params.dateKey : null,
-  });
+  })
+  .select("id")
+  .single();
 
   if (error) throw new Error(error.message);
+  return data.id as string;
 }
 
 export async function createCategory(params: {

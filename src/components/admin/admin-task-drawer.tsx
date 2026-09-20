@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WeekdayPicker } from "@/components/tasks/weekday-picker";
 import { adminKeys, createAdminTask, fetchMembers } from "@/lib/queries/admin";
+import { addTaskItems } from "@/lib/queries/items";
+import { PendingItems } from "@/components/tasks/pending-items";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
 import { toDateKey } from "@/lib/date";
 import type {
@@ -48,6 +50,7 @@ export function AdminTaskDrawer({
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [assignmentType, setAssignmentType] = useState<AssignmentType>("one");
   const [taskType, setTaskType] = useState<TaskType>("simple");
+  const [pendingItems, setPendingItems] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
@@ -65,8 +68,8 @@ export function AdminTaskDrawer({
   });
 
   const create = useMutation({
-    mutationFn: () =>
-      createAdminTask({
+    mutationFn: async () => {
+      const taskId = await createAdminTask({
         householdId,
         createdBy: userId,
         assignedTo,
@@ -78,7 +81,10 @@ export function AdminTaskDrawer({
         dateKey: toDateKey(new Date()),
         assignmentType,
         taskType,
-      }),
+      });
+
+      if (taskType === "list") await addTaskItems(taskId, pendingItems);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.tasks });
       queryClient.invalidateQueries({ queryKey: ["admin", "progress"] });
@@ -128,6 +134,7 @@ export function AdminTaskDrawer({
     setWeekdays([]);
     setAssignmentType("one");
     setTaskType("simple");
+    setPendingItems([]);
     setError(null);
   }
 
@@ -303,12 +310,12 @@ export function AdminTaskDrawer({
                   </button>
                 ))}
               </div>
-              {taskType === "list" && (
-                <p className="text-xs text-muted-foreground">
-                  بعد از ساخت، از همین داشبورد آیتم‌هایش را اضافه کن.
-                </p>
-              )}
             </div>
+
+            {/* آیتم‌ها همین‌جا نوشته می‌شوند تا لیست خالی تحویل کسی ندهیم */}
+            {taskType === "list" && (
+              <PendingItems items={pendingItems} onChange={setPendingItems} />
+            )}
 
             <div className="flex flex-col gap-2">
               <Label>اولویت</Label>

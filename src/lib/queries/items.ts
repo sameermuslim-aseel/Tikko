@@ -37,6 +37,25 @@ export async function addTaskItem(params: {
   if (error) throw new Error(error.message);
 }
 
+/** آیتم‌های یک تسک تازه‌ساخته، همه با هم */
+export async function addTaskItems(
+  taskId: string,
+  titles: string[],
+): Promise<void> {
+  const rows = titles
+    .map((title, index) => ({
+      task_id: taskId,
+      title: title.trim(),
+      sort_order: index,
+    }))
+    .filter((row) => row.title !== "");
+
+  if (rows.length === 0) return;
+
+  const { error } = await createClient().from("task_items").insert(rows);
+  if (error) throw new Error(error.message);
+}
+
 export async function deleteTaskItem(itemId: string): Promise<void> {
   const { error } = await createClient()
     .from("task_items")

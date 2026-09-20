@@ -4,7 +4,8 @@
  * خطوط از currentColor و تأکیدها از سبز «انجام شد».
  */
 
-const EMERALD = "#10b981";
+// از توکن استفاده می‌شود تا در تم تاریک هم درست دیده شود
+const BRAND = "var(--success)";
 
 /** ۰ — خانواده و کد دعوت */
 export function HouseholdIllustration() {
@@ -28,8 +29,8 @@ export function HouseholdIllustration() {
           strokeWidth="2.5" strokeLinecap="round" />
       </g>
       <g>
-        <circle cx="118" cy="86" r="9" fill={EMERALD} opacity="0.85" />
-        <path d="M106 108c1.5-7 6-10.5 12-10.5s10.5 3.5 12 10.5" stroke={EMERALD}
+        <circle cx="118" cy="86" r="9" fill={BRAND} opacity="0.85" />
+        <path d="M106 108c1.5-7 6-10.5 12-10.5s10.5 3.5 12 10.5" stroke={BRAND}
           strokeWidth="2.5" strokeLinecap="round" />
       </g>
 
@@ -72,16 +73,16 @@ export function TodayIllustration() {
 
       {/* تسک انجام‌شده */}
       <g>
-        <circle cx="128" cy="68" r="7" fill={EMERALD} />
-        <path d="M125 68l2.5 2.5 4.5-5" stroke="#fff" strokeWidth="2"
+        <circle cx="128" cy="68" r="7" fill={BRAND} />
+        <path d="M125 68l2.5 2.5 4.5-5" stroke="var(--success-foreground)" strokeWidth="2"
           strokeLinecap="round" strokeLinejoin="round" />
         <rect x="70" y="65" width="48" height="6" rx="3" fill="currentColor" opacity="0.25" />
       </g>
 
       {/* تسک انجام‌شده */}
       <g>
-        <circle cx="128" cy="92" r="7" fill={EMERALD} />
-        <path d="M125 92l2.5 2.5 4.5-5" stroke="#fff" strokeWidth="2"
+        <circle cx="128" cy="92" r="7" fill={BRAND} />
+        <path d="M125 92l2.5 2.5 4.5-5" stroke="var(--success-foreground)" strokeWidth="2"
           strokeLinecap="round" strokeLinejoin="round" />
         <rect x="78" y="89" width="40" height="6" rx="3" fill="currentColor" opacity="0.25" />
       </g>
@@ -117,8 +118,8 @@ export function AssignIllustration() {
       </g>
 
       {/* فلش از ادمین به عضو (راست به چپ) */}
-      <path d="M124 52H80" stroke={EMERALD} strokeWidth="3" strokeLinecap="round" />
-      <path d="M86 46l-7 6 7 6" stroke={EMERALD} strokeWidth="3"
+      <path d="M124 52H80" stroke={BRAND} strokeWidth="3" strokeLinecap="round" />
+      <path d="M86 46l-7 6 7 6" stroke={BRAND} strokeWidth="3"
         strokeLinecap="round" strokeLinejoin="round" />
 
       {/* چیپ‌های روز هفته */}
@@ -129,7 +130,7 @@ export function AssignIllustration() {
             <rect
               key={i}
               x={28 + i * 21} y="104" width="16" height="16" rx="8"
-              fill={active ? EMERALD : "currentColor"}
+              fill={active ? BRAND : "currentColor"}
               opacity={active ? 1 : 0.18}
             />
           );
@@ -153,13 +154,13 @@ export function StreakIllustration() {
       {/* ستون‌های رشد */}
       <rect x="40" y="96" width="18" height="34" rx="5" fill="currentColor" opacity="0.2" />
       <rect x="64" y="80" width="18" height="50" rx="5" fill="currentColor" opacity="0.32" />
-      <rect x="88" y="62" width="18" height="68" rx="5" fill={EMERALD} opacity="0.55" />
-      <rect x="112" y="44" width="18" height="86" rx="5" fill={EMERALD} />
+      <rect x="88" y="62" width="18" height="68" rx="5" fill={BRAND} opacity="0.55" />
+      <rect x="112" y="44" width="18" height="86" rx="5" fill={BRAND} />
 
       {/* شعله */}
       <path
         d="M150 30c8 8 12 15 12 23a12 12 0 01-24 0c0-5 3-9 6-13 2 3 4 4 6 4 2-5 1-9 0-14z"
-        fill={EMERALD}
+        fill={BRAND}
       />
 
       {/* زنگ یادآوری */}

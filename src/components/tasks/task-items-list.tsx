@@ -131,7 +131,7 @@ export function TaskItemsList({
               <span
                 className={`flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                   item.is_done
-                    ? "border-emerald-500 bg-emerald-500 text-white"
+                    ? "border-success bg-success text-success-foreground"
                     : "border-muted-foreground/40"
                 }`}
               >

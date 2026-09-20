@@ -53,7 +53,7 @@ function ProgressBar({ done, total }: { done: number; total: number }) {
   return (
     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
       <div
-        className="h-full rounded-full bg-emerald-500 transition-all"
+        className="h-full rounded-full bg-success transition-all"
         style={{ width: `${percent}%` }}
       />
     </div>
@@ -161,7 +161,7 @@ export function MemberSections({ userId }: { userId: string }) {
             onClick={() => setPriorityFilter(priorityFilter === p ? null : p)}
             className={`h-9 rounded-full border px-3 text-xs transition-colors ${
               priorityFilter === p
-                ? "border-foreground bg-foreground text-background"
+                ? "border-primary bg-primary text-primary-foreground"
                 : "border-input text-muted-foreground"
             }`}
           >
@@ -192,7 +192,7 @@ export function MemberSections({ userId }: { userId: string }) {
                   {group.key === "shared" ? (
                     <Users className="size-6 rounded-full bg-muted p-1 text-muted-foreground" />
                   ) : (
-                    <span className="flex size-6 items-center justify-center rounded-full bg-foreground text-xs text-background">
+                    <span className="flex size-6 items-center justify-center rounded-full bg-primary text-xs text-background">
                       {[...group.label][0]}
                     </span>
                   )}

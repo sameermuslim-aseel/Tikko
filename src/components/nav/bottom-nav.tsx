@@ -28,7 +28,7 @@ export function BottomNav({ role }: { role: Role }) {
             href={href}
             aria-current={active ? "page" : undefined}
             className={`flex flex-1 flex-col items-center gap-1 py-3 text-xs transition-colors ${
-              active ? "font-medium text-foreground" : "text-muted-foreground"
+              active ? "font-medium text-primary" : "text-muted-foreground"
             }`}
           >
             {/*

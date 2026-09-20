@@ -137,7 +137,7 @@ export function WeekView({ userId }: { userId: string }) {
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
           <div
-            className="h-full rounded-full bg-emerald-500 transition-all"
+            className="h-full rounded-full bg-success transition-all"
             style={{ width: `${weekPercent}%` }}
           />
         </div>
@@ -171,7 +171,7 @@ export function WeekView({ userId }: { userId: string }) {
             <section
               key={key}
               className={`rounded-xl border ${
-                isToday ? "border-foreground" : ""
+                isToday ? "border-primary" : ""
               }`}
             >
               <header className="flex items-center justify-between px-4 py-3">
@@ -183,7 +183,7 @@ export function WeekView({ userId }: { userId: string }) {
                     {formatDayNumber(day)}
                   </span>
                   {isToday && (
-                    <span className="rounded-full bg-foreground px-2 py-0.5 text-[10px] text-background">
+                    <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] text-background">
                       امروز
                     </span>
                   )}
@@ -193,7 +193,7 @@ export function WeekView({ userId }: { userId: string }) {
                   <span
                     className={`text-xs tabular-nums ${
                       done === dayTasks.length
-                        ? "text-emerald-600 dark:text-emerald-400"
+                        ? "text-success"
                         : "text-muted-foreground"
                     }`}
                   >
@@ -222,7 +222,7 @@ export function WeekView({ userId }: { userId: string }) {
                         <span
                           className={`flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                             task.is_completed
-                              ? "border-emerald-500 bg-emerald-500 text-white"
+                              ? "border-success bg-success text-success-foreground"
                               : "border-muted-foreground/40"
                           }`}
                         >

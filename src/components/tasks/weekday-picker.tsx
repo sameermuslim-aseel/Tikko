@@ -51,7 +51,7 @@ export function WeekdayPicker({
             aria-pressed={active}
             className={`size-11 rounded-full border text-sm transition-colors ${
               active
-                ? "border-foreground bg-foreground text-background"
+                ? "border-primary bg-primary text-primary-foreground"
                 : "border-input text-muted-foreground"
             }`}
           >

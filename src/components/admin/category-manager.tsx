@@ -95,7 +95,7 @@ export function CategoryManager({ householdId }: { householdId: string }) {
               aria-label={`رنگ ${c}`}
               aria-pressed={color === c}
               className={`size-8 rounded-full border-2 transition-transform ${
-                color === c ? "scale-110 border-foreground" : "border-transparent"
+                color === c ? "scale-110 border-primary" : "border-transparent"
               }`}
               style={{ backgroundColor: c }}
             />

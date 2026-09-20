@@ -168,7 +168,7 @@ export function AdminTaskDrawer({
             <button
               type="button"
               aria-label="تسک جدید"
-              className="pointer-events-auto absolute bottom-20 left-6 flex size-14 items-center justify-center rounded-full bg-foreground text-background shadow-lg"
+              className="pointer-events-auto absolute bottom-20 left-6 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
             >
               <Plus className="size-6" />
             </button>
@@ -253,7 +253,7 @@ export function AdminTaskDrawer({
                     aria-pressed={assignmentType === "one" && assignedTo === m.id}
                     className={`h-11 rounded-full border px-4 text-sm transition-colors ${
                       assignmentType === "one" && assignedTo === m.id
-                        ? "border-foreground bg-foreground text-background"
+                        ? "border-primary bg-primary text-primary-foreground"
                         : "border-input text-muted-foreground"
                     }`}
                   >
@@ -271,7 +271,7 @@ export function AdminTaskDrawer({
                   aria-pressed={assignmentType === "shared"}
                   className={`h-11 rounded-full border px-4 text-sm transition-colors ${
                     assignmentType === "shared"
-                      ? "border-foreground bg-foreground text-background"
+                      ? "border-primary bg-primary text-primary-foreground"
                       : "border-input text-muted-foreground"
                   }`}
                 >
@@ -328,7 +328,7 @@ export function AdminTaskDrawer({
                     aria-pressed={priority === p.value}
                     className={`h-11 rounded-lg border text-sm transition-colors ${
                       priority === p.value
-                        ? "border-foreground bg-foreground text-background"
+                        ? "border-primary bg-primary text-primary-foreground"
                         : "border-input text-muted-foreground"
                     }`}
                   >
@@ -352,7 +352,7 @@ export function AdminTaskDrawer({
                       aria-pressed={categoryId === c.id}
                       className={`flex h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors ${
                         categoryId === c.id
-                          ? "border-foreground"
+                          ? "border-primary"
                           : "border-input text-muted-foreground"
                       }`}
                     >

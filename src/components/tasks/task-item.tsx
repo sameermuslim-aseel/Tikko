@@ -58,9 +58,9 @@ export function TaskItem({
         <span
           className={`flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
             task.is_completed
-              ? "border-emerald-500 bg-emerald-500 text-white"
+              ? "border-success bg-success text-success-foreground"
               : isPartial
-                ? "border-emerald-500 bg-emerald-500/15"
+                ? "border-success bg-success/15"
                 : isSkipped
                   ? "border-muted-foreground/40 text-muted-foreground"
                   : "border-muted-foreground/40"
@@ -73,7 +73,7 @@ export function TaskItem({
             آن خاکستری با خط تیره است، این سبزِ در حال پیشرفت.
           */}
           {isPartial && (
-            <span className="size-2.5 rounded-[3px] bg-emerald-500" />
+            <span className="size-2.5 rounded-[3px] bg-success" />
           )}
 
           {isSkipped && <Minus className="size-3.5" strokeWidth={3} />}
@@ -124,7 +124,7 @@ export function TaskItem({
 
             {/* از کدام روز عقب افتاده بود — وگرنه در لیست امروز گم می‌شود */}
             {task.deferred_from && !task.is_completed && (
-              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] text-amber-700 dark:text-amber-400">
+              <span className="rounded-full bg-attention/15 px-2 py-0.5 text-[10px] text-attention">
                 مانده از {relativeDayLabel(task.deferred_from)}
               </span>
             )}

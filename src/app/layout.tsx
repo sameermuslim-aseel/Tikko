@@ -3,6 +3,7 @@ import { Vazirmatn } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { RegisterServiceWorker } from "@/components/pwa/register-service-worker";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 // Vazirmatn فونت اصلی است و مستقیماً به --font-sans وصل می‌شود
 const vazirmatn = Vazirmatn({
@@ -35,7 +36,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#ffffff",
+  themeColor: "#02968A",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="fa-AF"
       dir="rtl"
+      suppressHydrationWarning
       className={cn("h-full antialiased", vazirmatn.variable, "font-sans")}
     >
       {/*
@@ -51,8 +53,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         می‌شوند. این prop فقط همین یک المان را نادیده می‌گیرد، نه فرزندانش.
       */}
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        {children}
-        <RegisterServiceWorker />
+        <ThemeProvider>
+          {children}
+          <RegisterServiceWorker />
+        </ThemeProvider>
       </body>
     </html>
   );

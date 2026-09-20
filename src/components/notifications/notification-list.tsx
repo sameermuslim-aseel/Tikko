@@ -91,12 +91,12 @@ export function NotificationList() {
             <li
               key={row.id}
               className={`flex gap-3 rounded-xl border p-3 ${
-                unread ? "border-emerald-500/40 bg-emerald-500/5" : ""
+                unread ? "border-success/40 bg-success/5" : ""
               }`}
             >
               <span
                 className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
-                  unread ? "bg-emerald-500/15 text-emerald-600" : "bg-muted text-muted-foreground"
+                  unread ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"
                 }`}
               >
                 <Icon className="size-4" />

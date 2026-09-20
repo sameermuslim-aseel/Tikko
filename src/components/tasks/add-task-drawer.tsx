@@ -185,10 +185,22 @@ export function AddTaskDrawer({
                 autoFocus
               />
 
+              {/*
+                مثال واقعی بهتر از توضیح قاعده است — کاربر باید ببیند
+                چه می‌نویسد و چه اتفاقی می‌افتد.
+              */}
               {!showDetails && (
-                <p className="text-xs text-muted-foreground">
-                  «فردا» در آخر = برای فردا · «!» در آخر = اولویت زیاد
-                </p>
+                <div className="flex flex-col gap-1 rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
+                  <span>می‌توانی سریع‌تر بنویسی:</span>
+                  <span>
+                    <span className="text-foreground">نان بگیر فردا</span> ←
+                    تسک برای فردا ثبت می‌شود
+                  </span>
+                  <span>
+                    <span className="text-foreground">نان بگیر!</span> ← با
+                    اولویت زیاد ثبت می‌شود
+                  </span>
+                </div>
               )}
             </div>
 

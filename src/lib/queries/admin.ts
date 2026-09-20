@@ -4,6 +4,7 @@ import type {
   Priority,
   Role,
   ScheduleType,
+  TaskType,
 } from "@/lib/types";
 
 export type Member = {
@@ -17,6 +18,7 @@ export type AdminTask = {
   title: string;
   assigned_to: string | null;
   assignment_type: AssignmentType;
+  task_type: TaskType;
   category_id: string | null;
   priority: Priority;
   source: "admin" | "self";
@@ -52,7 +54,7 @@ export async function fetchAdminTasks(): Promise<AdminTask[]> {
   const { data, error } = await createClient()
     .from("tasks")
     .select(
-      "id, title, assigned_to, assignment_type, category_id, priority, source, schedule_type, weekdays, due_date, is_active",
+      "id, title, assigned_to, assignment_type, task_type, category_id, priority, source, schedule_type, weekdays, due_date, is_active",
     )
     .eq("is_active", true)
     .order("created_at", { ascending: false });
@@ -86,15 +88,17 @@ export async function createAdminTask(params: {
   weekdays: number[];
   dateKey: string;
   assignmentType: AssignmentType;
-}): Promise<void> {
+  taskType?: TaskType;
+}): Promise<string> {
   const isWeekly = params.scheduleType === "weekly";
   const isShared = params.assignmentType === "shared";
 
-  const { error } = await createClient().from("tasks").insert({
+  const { data, error } = await createClient().from("tasks").insert({
     household_id: params.householdId,
     created_by: params.createdBy,
     assigned_to: isShared ? null : params.assignedTo,
     assignment_type: params.assignmentType,
+    task_type: params.taskType ?? "simple",
     title: params.title.trim(),
     category_id: params.categoryId,
     priority: params.priority,
@@ -103,9 +107,12 @@ export async function createAdminTask(params: {
     due_date: isWeekly ? null : params.dateKey,
     weekdays: isWeekly ? params.weekdays : null,
     start_date: isWeekly ? params.dateKey : null,
-  });
+  })
+  .select("id")
+  .single();
 
   if (error) throw new Error(error.message);
+  return data.id as string;
 }
 
 export async function createCategory(params: {

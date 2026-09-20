@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, SlidersHorizontal } from "lucide-react";
+import { ListChecks, Plus, SlidersHorizontal } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Drawer,
@@ -17,11 +17,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WeekdayPicker } from "./weekday-picker";
 import { createSelfTask } from "@/lib/queries/tasks";
+import { addTaskItems } from "@/lib/queries/items";
+import { PendingItems } from "./pending-items";
 import { parseQuickTask } from "@/lib/quick-parse";
 import { addDays } from "date-fns";
 import { toDateKey } from "@/lib/date";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
-import type { AssignmentType, Priority, ScheduleType } from "@/lib/types";
+import type {
+  AssignmentType,
+  Priority,
+  ScheduleType,
+  TaskType,
+} from "@/lib/types";
 
 const PRIORITIES: { value: Priority; label: string }[] = [
   { value: "low", label: "کم" },
@@ -48,6 +55,8 @@ export function AddTaskDrawer({
   const [scheduleType, setScheduleType] = useState<ScheduleType>("once");
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [assignmentType, setAssignmentType] = useState<AssignmentType>("one");
+  const [taskType, setTaskType] = useState<TaskType>("simple");
+  const [pendingItems, setPendingItems] = useState<string[]>([]);
   // پیش‌فرض: فقط یک فیلد متن. زیر ۵ ثانیه (PLAN-PHASE2 بخش ۲.۵)
   const [showDetails, setShowDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,9 +70,9 @@ export function AddTaskDrawer({
   });
 
   const create = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (showDetails) {
-        return createSelfTask({
+        const taskId = await createSelfTask({
           householdId,
           userId,
           title,
@@ -73,7 +82,11 @@ export function AddTaskDrawer({
           weekdays,
           dateKey,
           assignmentType,
+          taskType,
         });
+
+        if (taskType === "list") await addTaskItems(taskId, pendingItems);
+        return;
       }
 
       // حالت سریع: بقیه پیش‌فرض، فقط دو قاعدهٔ «!» و «فردا»
@@ -83,7 +96,7 @@ export function AddTaskDrawer({
           ? toDateKey(addDays(new Date(`${dateKey}T00:00:00`), 1))
           : dateKey;
 
-      return createSelfTask({
+      const taskId = await createSelfTask({
         householdId,
         userId,
         title: quick.title,
@@ -93,7 +106,10 @@ export function AddTaskDrawer({
         weekdays: [],
         dateKey: targetDate,
         assignmentType: "one",
+        taskType,
       });
+
+      if (taskType === "list") await addTaskItems(taskId, pendingItems);
     },
     onSuccess: () => {
       // ممکن است تسک برای فردا ساخته شده باشد، پس همهٔ روزها تازه شوند
@@ -112,6 +128,8 @@ export function AddTaskDrawer({
     setScheduleType("once");
     setWeekdays([]);
     setAssignmentType("one");
+    setTaskType("simple");
+    setPendingItems([]);
     setShowDetails(false);
     setError(null);
   }
@@ -208,6 +226,44 @@ export function AddTaskDrawer({
               این دکمه تنها راه رسیدن به کتگوری، تکرار و تسک مشترک است؛
               اگر کم‌رنگ باشد کاربر فکر می‌کند اپ این امکانات را ندارد.
             */}
+            {/*
+              میان‌بر: بدون باز کردن جزئیات هم می‌شود تسک لیستی ساخت.
+              بعد از ذخیره، آیتم‌ها از خود تسک اضافه می‌شوند.
+            */}
+            {!showDetails && (
+              <button
+                type="button"
+                onClick={() =>
+                  setTaskType(taskType === "list" ? "simple" : "list")
+                }
+                aria-pressed={taskType === "list"}
+                className={`flex h-12 w-full items-center justify-between rounded-lg border px-4 text-sm font-medium transition-colors ${
+                  taskType === "list"
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-input hover:bg-muted"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <ListChecks className="size-4" />
+                  تسک لیستی
+                </span>
+                <span
+                  className={`text-xs font-normal ${
+                    taskType === "list"
+                      ? "text-background/70"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {taskType === "list" ? "بعد آیتم اضافه کن" : "چند آیتم داخلش"}
+                </span>
+              </button>
+            )}
+
+            {/* آیتم‌ها همین‌جا نوشته می‌شوند تا تسک لیستی خالی ساخته نشود */}
+            {taskType === "list" && (
+              <PendingItems items={pendingItems} onChange={setPendingItems} />
+            )}
+
             {!showDetails && (
               <button
                 type="button"
@@ -275,6 +331,37 @@ export function AddTaskDrawer({
                 </div>
               </div>
             )}
+
+            <div className="flex flex-col gap-2">
+              <Label>نوع تسک</Label>
+              <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
+                {(
+                  [
+                    ["simple", "ساده"],
+                    ["list", "لیستی"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setTaskType(value)}
+                    className={`h-10 rounded-md text-sm transition-colors ${
+                      taskType === value
+                        ? "bg-background font-medium shadow-sm"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {taskType === "list" && (
+                <p className="text-xs text-muted-foreground">
+                  داخلش آیتم اضافه می‌کنی (مثلاً نماز: صبح، چاشت، عصر…) و هر
+                  روز جداگانه تیک می‌خورند.
+                </p>
+              )}
+            </div>
 
             <div className="flex flex-col gap-2">
               <Label>برای کی</Label>

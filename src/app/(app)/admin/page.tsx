@@ -38,7 +38,7 @@ export default async function AdminPage() {
 
       <ProgressSection />
 
-      <AdminTaskList />
+      <AdminTaskList userId={user!.id} />
 
       <CategoryManager householdId={profile.household_id} />
 

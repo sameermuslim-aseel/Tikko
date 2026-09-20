@@ -146,6 +146,7 @@ export function TodayView({
         task={detailTask}
         dateKey={dateKey}
         role={role}
+        userId={userId}
         onClose={() => setDetailTask(null)}
       />
     </div>

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { RealtimeProvider } from "@/components/providers/realtime-provider";
 import { BottomNav } from "@/components/nav/bottom-nav";
 
 /**
@@ -101,8 +102,10 @@ export default async function AppLayout({
         </span>
       </header>
       <QueryProvider>
-        {children}
-        <BottomNav role={profile.role} />
+        <RealtimeProvider>
+          {children}
+          <BottomNav role={profile.role} />
+        </RealtimeProvider>
       </QueryProvider>
     </div>
   );

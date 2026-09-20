@@ -1,12 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { ListChecks, Trash2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminKeys, fetchAdminTasks, fetchMembers } from "@/lib/queries/admin";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
 import { deleteTask } from "@/lib/queries/tasks";
 import { WEEKDAY_LABELS } from "@/components/tasks/weekday-picker";
+import { TaskItemsList } from "@/components/tasks/task-items-list";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { toDateKey } from "@/lib/date";
+import type { AdminTask } from "@/lib/queries/admin";
 import type { Priority } from "@/lib/types";
 
 const PRIORITY_LABEL: Record<Priority, string> = {
@@ -15,9 +24,10 @@ const PRIORITY_LABEL: Record<Priority, string> = {
   high: "زیاد",
 };
 
-export function AdminTaskList() {
+export function AdminTaskList({ userId }: { userId: string }) {
   const [memberFilter, setMemberFilter] = useState<string | null>(null);
   const [priorityFilter, setPriorityFilter] = useState<Priority | null>(null);
+  const [itemsTask, setItemsTask] = useState<AdminTask | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -149,6 +159,19 @@ export function AdminTaskList() {
               </span>
             </div>
 
+            {/* تسک لیستی بدون آیتم بی‌فایده است؛ ادمین باید بتواند پرش کند */}
+            {task.task_type === "list" && (
+              <button
+                type="button"
+                onClick={() => setItemsTask(task)}
+                aria-label={`آیتم‌های ${task.title}`}
+                title="آیتم‌ها"
+                className="flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground"
+              >
+                <ListChecks className="size-4" />
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => remove.mutate(task.id)}
@@ -167,6 +190,32 @@ export function AdminTaskList() {
           {remove.error.message}
         </p>
       )}
+
+      {/*
+        تیک‌ها روزانه‌اند، ولی ادمین اینجا فقط آیتم‌ها را می‌سازد.
+        تاریخ امروز را می‌دهیم چون آیتم‌ها به خود تسک وصل‌اند نه به روز.
+      */}
+      <Drawer
+        open={itemsTask !== null}
+        onOpenChange={(open) => !open && setItemsTask(null)}
+      >
+        <DrawerContent>
+          <div className="mx-auto min-h-0 w-full max-w-md flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+            <DrawerHeader className="px-0">
+              <DrawerTitle>{itemsTask?.title}</DrawerTitle>
+            </DrawerHeader>
+
+            {itemsTask && (
+              <TaskItemsList
+                key={itemsTask.id}
+                taskId={itemsTask.id}
+                dateKey={toDateKey(new Date())}
+                userId={userId}
+              />
+            )}
+          </div>
+        </DrawerContent>
+      </Drawer>
     </section>
   );
 }

@@ -17,6 +17,7 @@ import {
   saveCompletionNote,
   tasksQueryKey,
 } from "@/lib/queries/tasks";
+import { TaskItemsList } from "./task-items-list";
 import type { Role, TaskForDate } from "@/lib/types";
 
 const PRIORITY_LABEL: Record<string, string> = {
@@ -84,11 +85,13 @@ export function TaskDetailDrawer({
   task,
   dateKey,
   role,
+  userId,
   onClose,
 }: {
   task: TaskForDate | null;
   dateKey: string;
   role: Role;
+  userId: string;
   onClose: () => void;
 }) {
   const queryClient = useQueryClient();
@@ -150,6 +153,18 @@ export function TaskDetailDrawer({
               <p className="text-muted-foreground">{task.description}</p>
             )}
           </dl>
+
+          {/* تسک لیستی: آیتم‌هایش همین‌جا تیک می‌خورند */}
+          {task?.task_type === "list" && (
+            <div className="mt-4 border-t px-4 pt-4">
+              <TaskItemsList
+                key={`${task.id}-${dateKey}`}
+                taskId={task.id}
+                dateKey={dateKey}
+                userId={userId}
+              />
+            </div>
+          )}
 
           {/* یادداشت فقط وقتی معنا دارد که تسک انجام شده باشد */}
           <div className="mt-4 flex flex-col gap-2 px-4">

@@ -5,6 +5,8 @@ export type Role = "admin" | "member";
 export type CompletionStatus = "done" | "skipped";
 /** یک‌نفره یا مشترک («هر کی زودتر») */
 export type AssignmentType = "one" | "shared";
+/** تسک ساده یا تسکی که داخلش آیتم دارد */
+export type TaskType = "simple" | "list";
 
 /** خروجی تابع get_tasks_for_date */
 export type TaskForDate = {
@@ -16,6 +18,7 @@ export type TaskForDate = {
   time_of_day: string | null;
   assigned_to: string | null;
   assignment_type: AssignmentType;
+  task_type: TaskType;
   category_id: string | null;
   category_name: string | null;
   category_color: string | null;
@@ -26,4 +29,6 @@ export type TaskForDate = {
   deferred_from: string | null;
   /** برای تسک مشترک: چه کسی زودتر انجامش داد */
   completed_by_name: string | null;
+  items_total: number;
+  items_done: number;
 };

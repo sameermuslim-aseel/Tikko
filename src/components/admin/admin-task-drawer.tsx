@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Drawer,
@@ -17,9 +17,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WeekdayPicker } from "@/components/tasks/weekday-picker";
 import { adminKeys, createAdminTask, fetchMembers } from "@/lib/queries/admin";
+import { addTaskItems } from "@/lib/queries/items";
+import { PendingItems } from "@/components/tasks/pending-items";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
 import { toDateKey } from "@/lib/date";
-import type { AssignmentType, Priority, ScheduleType } from "@/lib/types";
+import type {
+  AssignmentType,
+  Priority,
+  ScheduleType,
+  TaskType,
+} from "@/lib/types";
 
 const PRIORITIES: { value: Priority; label: string }[] = [
   { value: "low", label: "کم" },
@@ -42,6 +49,8 @@ export function AdminTaskDrawer({
   const [scheduleType, setScheduleType] = useState<ScheduleType>("weekly");
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [assignmentType, setAssignmentType] = useState<AssignmentType>("one");
+  const [taskType, setTaskType] = useState<TaskType>("simple");
+  const [pendingItems, setPendingItems] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
@@ -59,8 +68,8 @@ export function AdminTaskDrawer({
   });
 
   const create = useMutation({
-    mutationFn: () =>
-      createAdminTask({
+    mutationFn: async () => {
+      const taskId = await createAdminTask({
         householdId,
         createdBy: userId,
         assignedTo,
@@ -71,7 +80,11 @@ export function AdminTaskDrawer({
         weekdays,
         dateKey: toDateKey(new Date()),
         assignmentType,
-      }),
+        taskType,
+      });
+
+      if (taskType === "list") await addTaskItems(taskId, pendingItems);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.tasks });
       queryClient.invalidateQueries({ queryKey: ["admin", "progress"] });
@@ -82,6 +95,36 @@ export function AdminTaskDrawer({
     onError: (err) => setError(err.message),
   });
 
+  // آخرین @ که هنوز تمام نشده — مثل «بردن زباله @حس»
+  const mentionMatch = title.match(/@([^\s@]*)$/);
+  const mention = mentionMatch ? mentionMatch[1] : null;
+
+  const mentionOptions =
+    mention === null
+      ? []
+      : [
+          ...(members ?? []).map((m) => ({
+            id: m.id,
+            label: m.display_name ?? "بی‌نام",
+          })),
+          { id: "shared", label: "مشترک — هر کی زودتر" },
+        ].filter((option) =>
+          mention === "" ? true : option.label.includes(mention),
+        );
+
+  function applyMention(option: { id: string; label: string }) {
+    if (option.id === "shared") {
+      setAssignmentType("shared");
+      setAssignedTo(null);
+    } else {
+      setAssignmentType("one");
+      setAssignedTo(option.id);
+    }
+
+    // خود @ و متنی که تایپ شده از عنوان پاک می‌شود
+    setTitle(title.replace(/@[^\s@]*$/, "").trimEnd());
+  }
+
   function reset() {
     setTitle("");
     setAssignedTo(null);
@@ -90,6 +133,8 @@ export function AdminTaskDrawer({
     setScheduleType("weekly");
     setWeekdays([]);
     setAssignmentType("one");
+    setTaskType("simple");
+    setPendingItems([]);
     setError(null);
   }
 
@@ -146,10 +191,52 @@ export function AdminTaskDrawer({
                 id="admin-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="مثلاً: بردن زباله"
+                placeholder="مثلاً: بردن زباله @حسنا"
                 required
                 autoFocus
+                autoComplete="off"
               />
+
+              {/*
+                نوشتن @ فهرست اعضا را باز می‌کند تا بدون رفتن به چیپ‌های
+                پایین، همان‌جا مسئول تسک انتخاب شود.
+              */}
+              {mention !== null && (
+                <ul className="flex flex-col overflow-hidden rounded-lg border">
+                  {mentionOptions.length === 0 && (
+                    <li className="px-4 py-2 text-xs text-muted-foreground">
+                      کسی با این نام نیست
+                    </li>
+                  )}
+
+                  {mentionOptions.map((option) => (
+                    <li key={option.id}>
+                      <button
+                        type="button"
+                        onClick={() => applyMention(option)}
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-right text-sm hover:bg-muted"
+                      >
+                        {option.id === "shared" ? (
+                          <Users className="size-4 text-muted-foreground" />
+                        ) : (
+                          <span className="flex size-6 items-center justify-center rounded-full bg-muted text-xs">
+                            {[...(option.label ?? "")][0]}
+                          </span>
+                        )}
+                        {option.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* mention ممکن است رشتهٔ خالی باشد (تازه @ زده) — آن هم یعنی باز است */}
+              {mention === null && (
+                <p className="text-xs text-muted-foreground">
+                  با نوشتن <span className="text-foreground">@</span> می‌توانی
+                  مسئول تسک را انتخاب کنی.
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -199,6 +286,36 @@ export function AdminTaskDrawer({
                 </p>
               )}
             </div>
+
+            <div className="flex flex-col gap-2">
+              <Label>نوع تسک</Label>
+              <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
+                {(
+                  [
+                    ["simple", "ساده"],
+                    ["list", "لیستی"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setTaskType(value)}
+                    className={`h-10 rounded-md text-sm transition-colors ${
+                      taskType === value
+                        ? "bg-background font-medium shadow-sm"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* آیتم‌ها همین‌جا نوشته می‌شوند تا لیست خالی تحویل کسی ندهیم */}
+            {taskType === "list" && (
+              <PendingItems items={pendingItems} onChange={setPendingItems} />
+            )}
 
             <div className="flex flex-col gap-2">
               <Label>اولویت</Label>

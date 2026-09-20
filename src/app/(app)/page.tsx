@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/supabase/user";
 import { TodayView } from "@/components/tasks/today-view";
 
 /** نمای «امروز» — صفحهٔ اصلی (PLAN بخش ۵) */
@@ -6,17 +7,8 @@ export default async function TodayPage({ searchParams }: PageProps<"/">) {
   // میان‌بر آیکون اپ مستقیم فرم تسک جدید را باز می‌کند
   const openNewTask = "new" in (await searchParams);
 
+  const profile = await getCurrentProfile();
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, household_id")
-    .eq("id", user!.id)
-    .single();
 
   // موقتی تا مرحلهٔ ۴ (داشبورد ادمین): کد دعوت برای اضافه کردن عضو
   const { data: household } =
@@ -31,7 +23,7 @@ export default async function TodayPage({ searchParams }: PageProps<"/">) {
   return (
     <>
       <TodayView
-        userId={user!.id}
+        userId={profile!.id}
         householdId={profile!.household_id}
         role={profile!.role}
         openNewTask={openNewTask}

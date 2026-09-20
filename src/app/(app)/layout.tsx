@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Bell, CircleQuestionMark, Settings } from "lucide-react";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/supabase/user";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { RealtimeProvider } from "@/components/providers/realtime-provider";
@@ -14,32 +14,16 @@ import { BottomNav } from "@/components/nav/bottom-nav";
 export default async function AppLayout({
   children,
 }: LayoutProps<"/">) {
-  const supabase = await createClient();
+  // یک بار در هر درخواست — layout و page دیگر جدا صدا نمی‌زنند
+  const profile = await getCurrentProfile();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!profile) redirect("/login");
 
-  if (!user) redirect("/login");
+  // آموزش قبل از همه‌چیز — حتی قبل از onboarding، چون کاربر تازه
+  // هنوز نمی‌داند «خانواده» یعنی چه
+  if (profile.intro_seen_at === null) redirect("/welcome");
 
-  // آموزش قبل از همه‌چیز: کاربر تازه باید اول بداند خانواده یعنی چه
-  const { data: intro } = await supabase
-    .from("profiles")
-    .select("intro_seen_at")
-    .eq("id", user.id)
-    .single();
-
-  // کوئری جدا از پایین است: اگر migration این ستون اجرا نشده باشد،
-  // نباید کل کوئری پروفایل خطا بدهد و حلقهٔ ریدایرکت بسازد.
-  if (intro && !intro.intro_seen_at) redirect("/welcome");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name, role, household_id")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile?.household_id) redirect("/onboarding");
+  if (!profile.household_id) redirect("/onboarding");
 
   // حرف اول نام برای آواتار — با [...] تا حروف چندبایتی هم درست بریده شوند
   const initial = [...(profile.display_name?.trim() ?? "")][0]?.toUpperCase() ?? "؟";

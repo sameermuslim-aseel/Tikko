@@ -19,7 +19,12 @@ import { WeekdayPicker } from "@/components/tasks/weekday-picker";
 import { adminKeys, createAdminTask, fetchMembers } from "@/lib/queries/admin";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
 import { toDateKey } from "@/lib/date";
-import type { AssignmentType, Priority, ScheduleType } from "@/lib/types";
+import type {
+  AssignmentType,
+  Priority,
+  ScheduleType,
+  TaskType,
+} from "@/lib/types";
 
 const PRIORITIES: { value: Priority; label: string }[] = [
   { value: "low", label: "کم" },
@@ -42,6 +47,7 @@ export function AdminTaskDrawer({
   const [scheduleType, setScheduleType] = useState<ScheduleType>("weekly");
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [assignmentType, setAssignmentType] = useState<AssignmentType>("one");
+  const [taskType, setTaskType] = useState<TaskType>("simple");
   const [error, setError] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
@@ -71,6 +77,7 @@ export function AdminTaskDrawer({
         weekdays,
         dateKey: toDateKey(new Date()),
         assignmentType,
+        taskType,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.tasks });
@@ -90,6 +97,7 @@ export function AdminTaskDrawer({
     setScheduleType("weekly");
     setWeekdays([]);
     setAssignmentType("one");
+    setTaskType("simple");
     setError(null);
   }
 
@@ -196,6 +204,36 @@ export function AdminTaskDrawer({
                 <p className="text-xs text-muted-foreground">
                   در لیست همه دیده می‌شود؛ هر کی زودتر انجام داد، برای همه
                   انجام‌شده حساب می‌شود.
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label>نوع تسک</Label>
+              <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
+                {(
+                  [
+                    ["simple", "ساده"],
+                    ["list", "لیستی"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setTaskType(value)}
+                    className={`h-10 rounded-md text-sm transition-colors ${
+                      taskType === value
+                        ? "bg-background font-medium shadow-sm"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {taskType === "list" && (
+                <p className="text-xs text-muted-foreground">
+                  بعد از ساخت، از همین داشبورد آیتم‌هایش را اضافه کن.
                 </p>
               )}
             </div>

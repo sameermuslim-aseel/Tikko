@@ -18,6 +18,7 @@ export type AdminTask = {
   title: string;
   assigned_to: string | null;
   assignment_type: AssignmentType;
+  task_type: TaskType;
   category_id: string | null;
   priority: Priority;
   source: "admin" | "self";
@@ -53,7 +54,7 @@ export async function fetchAdminTasks(): Promise<AdminTask[]> {
   const { data, error } = await createClient()
     .from("tasks")
     .select(
-      "id, title, assigned_to, assignment_type, category_id, priority, source, schedule_type, weekdays, due_date, is_active",
+      "id, title, assigned_to, assignment_type, task_type, category_id, priority, source, schedule_type, weekdays, due_date, is_active",
     )
     .eq("is_active", true)
     .order("created_at", { ascending: false });

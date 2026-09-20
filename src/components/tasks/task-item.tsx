@@ -26,6 +26,14 @@ export function TaskItem({
   // تسک لیستی با تیک زدن آیتم‌هایش کامل می‌شود، نه با یک لمس روی خودش
   const isList = task.task_type === "list";
 
+  // بعضی آیتم‌ها تیک خورده، نه همه → حالت نیمه (indeterminate)
+  const isPartial =
+    isList &&
+    !task.is_completed &&
+    !isSkipped &&
+    task.items_done > 0 &&
+    task.items_done < task.items_total;
+
   return (
     // div بیرونی است چون دکمه داخل دکمه HTML نامعتبر است
     <div
@@ -37,7 +45,8 @@ export function TaskItem({
         type="button"
         onClick={() => (isList ? onOpenDetail(task) : onToggle(task))}
         disabled={disabled && !isList}
-        aria-pressed={task.is_completed}
+        // «mixed» حالت استاندارد نیمه‌تیک برای صفحه‌خوان‌هاست
+        aria-pressed={isPartial ? "mixed" : task.is_completed}
         className="flex min-w-0 flex-1 items-center gap-3 p-3 text-right"
       >
         {/* اولویت بالا: نوار قرمز باریک، بدون هیاهو (PLAN بخش ۵) */}
@@ -50,12 +59,23 @@ export function TaskItem({
           className={`flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
             task.is_completed
               ? "border-emerald-500 bg-emerald-500 text-white"
-              : isSkipped
-                ? "border-muted-foreground/40 text-muted-foreground"
-                : "border-muted-foreground/40"
+              : isPartial
+                ? "border-emerald-500 bg-emerald-500/15"
+                : isSkipped
+                  ? "border-muted-foreground/40 text-muted-foreground"
+                  : "border-muted-foreground/40"
           }`}
         >
           {task.is_completed && <Check className="size-4" strokeWidth={3} />}
+
+          {/*
+            نیمه‌تیک: مربع پُر وسط دایره. عمداً با «رد شد» فرق دارد —
+            آن خاکستری با خط تیره است، این سبزِ در حال پیشرفت.
+          */}
+          {isPartial && (
+            <span className="size-2.5 rounded-[3px] bg-emerald-500" />
+          )}
+
           {isSkipped && <Minus className="size-3.5" strokeWidth={3} />}
         </span>
 

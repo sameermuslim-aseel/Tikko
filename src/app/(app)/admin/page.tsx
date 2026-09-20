@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/user";
-import { ProgressSection } from "@/components/admin/progress-section";
-import { AdminTaskList } from "@/components/admin/admin-task-list";
+import { MemberSections } from "@/components/admin/member-sections";
 import { CategoryManager } from "@/components/admin/category-manager";
 import { AdminTaskDrawer } from "@/components/admin/admin-task-drawer";
 
@@ -29,9 +28,7 @@ export default async function AdminPage() {
         <p className="text-sm text-muted-foreground">داشبورد ادمین</p>
       </header>
 
-      <ProgressSection />
-
-      <AdminTaskList userId={profile!.id} />
+      <MemberSections userId={profile!.id} />
 
       <CategoryManager householdId={profile.household_id} />
 

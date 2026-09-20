@@ -20,10 +20,12 @@ export function TodayView({
   userId,
   householdId,
   role,
+  openNewTask = false,
 }: {
   userId: string;
   householdId: string;
   role: Role;
+  openNewTask?: boolean;
 }) {
   const [selected, setSelected] = useState(() => new Date());
   const [detailTask, setDetailTask] = useState<TaskForDate | null>(null);
@@ -137,6 +139,7 @@ export function TodayView({
         householdId={householdId}
         userId={userId}
         dateKey={dateKey}
+        openOnMount={openNewTask}
       />
 
       <TaskDetailDrawer

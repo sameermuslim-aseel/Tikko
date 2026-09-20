@@ -16,7 +16,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WeekdayPicker } from "./weekday-picker";
-import { createSelfTask, tasksQueryKey } from "@/lib/queries/tasks";
+import { createSelfTask } from "@/lib/queries/tasks";
+import { parseQuickTask } from "@/lib/quick-parse";
+import { addDays } from "date-fns";
+import { toDateKey } from "@/lib/date";
 import { categoriesQueryKey, fetchCategories } from "@/lib/queries/categories";
 import type { AssignmentType, Priority, ScheduleType } from "@/lib/types";
 
@@ -30,18 +33,23 @@ export function AddTaskDrawer({
   householdId,
   userId,
   dateKey,
+  openOnMount = false,
 }: {
   householdId: string;
   userId: string;
   dateKey: string;
+  /** میان‌بر آیکون اپ: /?new=1 */
+  openOnMount?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(openOnMount);
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [priority, setPriority] = useState<Priority>("medium");
   const [scheduleType, setScheduleType] = useState<ScheduleType>("once");
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [assignmentType, setAssignmentType] = useState<AssignmentType>("one");
+  // پیش‌فرض: فقط یک فیلد متن. زیر ۵ ثانیه (PLAN-PHASE2 بخش ۲.۵)
+  const [showDetails, setShowDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
@@ -53,20 +61,44 @@ export function AddTaskDrawer({
   });
 
   const create = useMutation({
-    mutationFn: () =>
-      createSelfTask({
+    mutationFn: () => {
+      if (showDetails) {
+        return createSelfTask({
+          householdId,
+          userId,
+          title,
+          categoryId,
+          priority,
+          scheduleType,
+          weekdays,
+          dateKey,
+          assignmentType,
+        });
+      }
+
+      // حالت سریع: بقیه پیش‌فرض، فقط دو قاعدهٔ «!» و «فردا»
+      const quick = parseQuickTask(title);
+      const targetDate =
+        quick.dayOffset === 1
+          ? toDateKey(addDays(new Date(`${dateKey}T00:00:00`), 1))
+          : dateKey;
+
+      return createSelfTask({
         householdId,
         userId,
-        title,
-        categoryId,
-        priority,
-        scheduleType,
-        weekdays,
-        dateKey,
-        assignmentType,
-      }),
+        title: quick.title,
+        categoryId: null,
+        priority: quick.priority,
+        scheduleType: "once",
+        weekdays: [],
+        dateKey: targetDate,
+        assignmentType: "one",
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: tasksQueryKey(dateKey) });
+      // ممکن است تسک برای فردا ساخته شده باشد، پس همهٔ روزها تازه شوند
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["week"] });
       reset();
       setOpen(false);
     },
@@ -80,6 +112,7 @@ export function AddTaskDrawer({
     setScheduleType("once");
     setWeekdays([]);
     setAssignmentType("one");
+    setShowDetails(false);
     setError(null);
   }
 
@@ -87,7 +120,12 @@ export function AddTaskDrawer({
     event.preventDefault();
     setError(null);
 
-    if (scheduleType === "weekly" && weekdays.length === 0) {
+    if (!showDetails && parseQuickTask(title).title === "") {
+      setError("عنوان تسک را بنویس.");
+      return;
+    }
+
+    if (showDetails && scheduleType === "weekly" && weekdays.length === 0) {
       setError("حداقل یک روز هفته را انتخاب کنید.");
       return;
     }
@@ -142,12 +180,30 @@ export function AddTaskDrawer({
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="مثلاً: آب دادن گل‌ها"
+                placeholder="مثلاً: نان بگیر فردا"
                 required
                 autoFocus
               />
+
+              {!showDetails && (
+                <p className="text-xs text-muted-foreground">
+                  «فردا» در آخر = برای فردا · «!» در آخر = اولویت زیاد
+                </p>
+              )}
             </div>
 
+            {!showDetails && (
+              <button
+                type="button"
+                onClick={() => setShowDetails(true)}
+                className="self-start text-sm text-muted-foreground underline-offset-4 hover:underline"
+              >
+                جزئیات بیشتر
+              </button>
+            )}
+
+            {showDetails && (
+            <>
             <div className="flex flex-col gap-2">
               <Label>اولویت</Label>
               <div className="grid grid-cols-3 gap-2">
@@ -256,6 +312,8 @@ export function AddTaskDrawer({
 
             {scheduleType === "weekly" && (
               <WeekdayPicker value={weekdays} onChange={setWeekdays} />
+            )}
+            </>
             )}
 
             {error && (

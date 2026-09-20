@@ -2,7 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { TodayView } from "@/components/tasks/today-view";
 
 /** نمای «امروز» — صفحهٔ اصلی (PLAN بخش ۵) */
-export default async function TodayPage() {
+export default async function TodayPage({ searchParams }: PageProps<"/">) {
+  // میان‌بر آیکون اپ مستقیم فرم تسک جدید را باز می‌کند
+  const openNewTask = "new" in (await searchParams);
+
   const supabase = await createClient();
 
   const {
@@ -31,6 +34,7 @@ export default async function TodayPage() {
         userId={user!.id}
         householdId={profile!.household_id}
         role={profile!.role}
+        openNewTask={openNewTask}
       />
 
       <footer className="flex flex-col gap-1 px-4 pb-6 text-center text-xs text-muted-foreground">

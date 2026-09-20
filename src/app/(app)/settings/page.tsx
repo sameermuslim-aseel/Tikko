@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NotificationSettingsForm } from "@/components/settings/notification-settings";
+import { ThemeSwitch } from "@/components/settings/theme-switch";
 import type { NotificationSettings } from "@/lib/queries/settings";
 
 export default async function SettingsPage() {
@@ -30,8 +31,12 @@ export default async function SettingsPage() {
     <div className="flex flex-1 flex-col gap-4 py-4 pb-24">
       <header className="px-4">
         <h1 className="text-xl font-bold">تنظیمات</h1>
-        <p className="text-sm text-muted-foreground">یادآوری‌ها</p>
+        <p className="text-sm text-muted-foreground">ظاهر و یادآوری‌ها</p>
       </header>
+
+      <div className="px-4">
+        <ThemeSwitch />
+      </div>
 
       <NotificationSettingsForm userId={user!.id} initial={initial} />
     </div>

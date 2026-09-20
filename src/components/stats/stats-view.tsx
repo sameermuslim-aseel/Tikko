@@ -116,7 +116,7 @@ export function StatsView() {
                     isToday ? "outline-2 outline-foreground" : ""
                   } ${
                     state === "done"
-                      ? "bg-success text-white"
+                      ? "bg-success text-success-foreground"
                       : state === "partial"
                         ? "bg-success/25 text-success"
                         : "border border-dashed border-muted-foreground/30 text-muted-foreground/50"

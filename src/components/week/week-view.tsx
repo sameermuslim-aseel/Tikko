@@ -222,7 +222,7 @@ export function WeekView({ userId }: { userId: string }) {
                         <span
                           className={`flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                             task.is_completed
-                              ? "border-success bg-success text-white"
+                              ? "border-success bg-success text-success-foreground"
                               : "border-muted-foreground/40"
                           }`}
                         >

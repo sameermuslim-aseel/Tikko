@@ -168,7 +168,7 @@ export function OverdueSection({ userId }: { userId: string }) {
                         type="button"
                         disabled={act.isPending}
                         onClick={() => act.mutate({ task, action: "done" })}
-                        className="h-9 rounded-lg bg-success text-xs font-medium text-white"
+                        className="h-9 rounded-lg bg-success text-xs font-medium text-success-foreground"
                       >
                         انجام شد
                       </button>

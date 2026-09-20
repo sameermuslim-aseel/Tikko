@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, SlidersHorizontal } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Drawer,
@@ -204,13 +204,23 @@ export function AddTaskDrawer({
               )}
             </div>
 
+            {/*
+              این دکمه تنها راه رسیدن به کتگوری، تکرار و تسک مشترک است؛
+              اگر کم‌رنگ باشد کاربر فکر می‌کند اپ این امکانات را ندارد.
+            */}
             {!showDetails && (
               <button
                 type="button"
                 onClick={() => setShowDetails(true)}
-                className="self-start text-sm text-muted-foreground underline-offset-4 hover:underline"
+                className="flex h-12 w-full items-center justify-between rounded-lg border border-input px-4 text-sm font-medium transition-colors hover:bg-muted"
               >
-                جزئیات بیشتر
+                <span className="flex items-center gap-2">
+                  <SlidersHorizontal className="size-4" />
+                  جزئیات بیشتر
+                </span>
+                <span className="text-xs font-normal text-muted-foreground">
+                  اولویت، کتگوری، تکرار
+                </span>
               </button>
             )}
 

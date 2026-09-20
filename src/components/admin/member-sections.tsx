@@ -53,7 +53,7 @@ function ProgressBar({ done, total }: { done: number; total: number }) {
   return (
     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
       <div
-        className="h-full rounded-full bg-emerald-500 transition-all"
+        className="h-full rounded-full bg-success transition-all"
         style={{ width: `${percent}%` }}
       />
     </div>

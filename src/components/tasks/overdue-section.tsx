@@ -85,7 +85,7 @@ export function OverdueSection({ userId }: { userId: string }) {
   }
 
   return (
-    <section className="mx-4 mb-3 overflow-hidden rounded-xl border border-amber-500/40 bg-amber-500/5">
+    <section className="mx-4 mb-3 overflow-hidden rounded-xl border border-attention/40 bg-attention/5">
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -111,7 +111,7 @@ export function OverdueSection({ userId }: { userId: string }) {
       </button>
 
       {open && (
-        <div className="border-t border-amber-500/20">
+        <div className="border-t border-attention/20">
           <p className="px-4 pt-3 text-xs text-muted-foreground">
             هر کدام را بررسی کن: انجامش دادی، امروز می‌کنی، یا دیگر لازم نیست.
           </p>
@@ -168,7 +168,7 @@ export function OverdueSection({ userId }: { userId: string }) {
                         type="button"
                         disabled={act.isPending}
                         onClick={() => act.mutate({ task, action: "done" })}
-                        className="h-9 rounded-lg bg-emerald-500 text-xs font-medium text-white"
+                        className="h-9 rounded-lg bg-success text-xs font-medium text-white"
                       >
                         انجام شد
                       </button>

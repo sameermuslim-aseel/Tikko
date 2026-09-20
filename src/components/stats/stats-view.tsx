@@ -63,12 +63,12 @@ export function StatsView() {
       {/* استریک فعلی */}
       <div
         className={`flex flex-col items-center gap-1 rounded-xl border p-6 ${
-          streak > 0 ? "border-emerald-500/40 bg-emerald-500/5" : ""
+          streak > 0 ? "border-success/40 bg-success/5" : ""
         }`}
       >
         <span className="text-4xl">{streak > 0 ? "🔥" : "🌱"}</span>
         <span
-          className={`text-4xl font-bold ${streak > 0 ? "text-emerald-600 dark:text-emerald-400" : ""}`}
+          className={`text-4xl font-bold ${streak > 0 ? "text-success" : ""}`}
         >
           {formatNumber(streak)}
         </span>
@@ -116,9 +116,9 @@ export function StatsView() {
                     isToday ? "outline-2 outline-foreground" : ""
                   } ${
                     state === "done"
-                      ? "bg-emerald-500 text-white"
+                      ? "bg-success text-white"
                       : state === "partial"
-                        ? "bg-emerald-500/25 text-emerald-700 dark:text-emerald-300"
+                        ? "bg-success/25 text-success"
                         : "border border-dashed border-muted-foreground/30 text-muted-foreground/50"
                   }`}
                 >
@@ -141,11 +141,11 @@ export function StatsView() {
         {/* راهنما — بدون این، مربع‌ها معنایی ندارند */}
         <div className="flex flex-wrap gap-x-4 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded bg-emerald-500" />
+            <span className="size-3 rounded bg-success" />
             همه انجام شد
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded bg-emerald-500/25" />
+            <span className="size-3 rounded bg-success/25" />
             ناقص
           </span>
           <span className="flex items-center gap-1.5">

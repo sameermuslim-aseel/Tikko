@@ -137,7 +137,7 @@ export function WeekView({ userId }: { userId: string }) {
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
           <div
-            className="h-full rounded-full bg-emerald-500 transition-all"
+            className="h-full rounded-full bg-success transition-all"
             style={{ width: `${weekPercent}%` }}
           />
         </div>
@@ -193,7 +193,7 @@ export function WeekView({ userId }: { userId: string }) {
                   <span
                     className={`text-xs tabular-nums ${
                       done === dayTasks.length
-                        ? "text-emerald-600 dark:text-emerald-400"
+                        ? "text-success"
                         : "text-muted-foreground"
                     }`}
                   >
@@ -222,7 +222,7 @@ export function WeekView({ userId }: { userId: string }) {
                         <span
                           className={`flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                             task.is_completed
-                              ? "border-emerald-500 bg-emerald-500 text-white"
+                              ? "border-success bg-success text-white"
                               : "border-muted-foreground/40"
                           }`}
                         >

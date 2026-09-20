@@ -41,7 +41,7 @@ function Toggle({
       <span className="text-sm">{label}</span>
       <span
         className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-          checked ? "bg-emerald-500" : "bg-muted-foreground/30"
+          checked ? "bg-success" : "bg-muted-foreground/30"
         }`}
       >
         <span
@@ -135,7 +135,7 @@ export function NotificationSettingsForm({
       <section className="flex flex-col gap-3 rounded-xl border p-4">
         <div className="flex items-center gap-2">
           {subscribed ? (
-            <BellRing className="size-5 text-emerald-600" />
+            <BellRing className="size-5 text-success" />
           ) : (
             <BellOff className="size-5 text-muted-foreground" />
           )}
